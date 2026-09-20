@@ -677,7 +677,7 @@
 }
 
 .scenario-result-dialog[data-result='loss'] :is(
-  .scenario-result-header span,
+  .scenario-result-header > span,
   .scenario-opponent-order,
   .scenario-opponent strong
 ) {
@@ -734,10 +734,54 @@
   font-size: 72px;
 }
 
-.scenario-result-header span {
+.scenario-result-header > span {
   color: #fff;
   font-size: 14px;
   font-weight: 700;
+}
+
+.scenario-result-loss-letter {
+  display: inline-block;
+  transform-origin: 50% 25%;
+  animation: scenario-loss-stamp 560ms linear 200ms both;
+}
+
+.scenario-result-loss-letter:nth-child(2) {
+  animation-delay: 680ms;
+}
+
+@keyframes scenario-loss-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2.2);
+    filter: blur(2px);
+  }
+  14% {
+    opacity: 1;
+    transform: scale(2.05);
+    filter: blur(1px);
+    animation-timing-function: cubic-bezier(0.6, 0, 1, 1);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(0.1em) scale(1.18, 0.78);
+    filter: blur(0);
+  }
+  48% {
+    transform: translate(-0.045em, -0.025em) scale(1.04, 1.02);
+  }
+  56% {
+    transform: translate(0.035em, 0.035em) scale(1.02, 0.96);
+  }
+  65% {
+    transform: translate(-0.02em, 0.015em) scale(1, 0.99);
+  }
+  78%,
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    filter: blur(0);
+  }
 }
 
 .scenario-opponent-track {
@@ -3032,6 +3076,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .scenario-result-loss-letter {
+    animation: none;
+  }
+
   .scenario-opponent:is(.scenario-opponent-next, .scenario-opponent-failed)
     .scenario-opponent-icon {
     animation: none;

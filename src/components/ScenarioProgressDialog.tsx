@@ -86,7 +86,15 @@ const ScenarioProgressDialog = ({
         transition={{ delay: 0.06, duration: 0.34, ease: 'easeOut' }}
       >
         <header className="scenario-result-header">
-          <h2 id="scenario-result-title">{title}</h2>
+          <h2 id="scenario-result-title" aria-label={result === 'loss' ? title : undefined}>
+            {result === 'loss'
+              ? [...title].map((letter) => (
+                  <span key={letter} className="scenario-result-loss-letter" aria-hidden="true">
+                    {letter}
+                  </span>
+                ))
+              : title}
+          </h2>
           <span id="scenario-result-description">{description}</span>
         </header>
         <ol className="scenario-opponent-track" aria-label="対戦相手一覧">
