@@ -37,6 +37,7 @@ const ScenarioProgressDialog = ({
   const playerWon = result === 'win'
   const scenarioComplete =
     playerWon && currentBattleIndex === opponentDeckIds.length - 1
+  const animateResultTitle = result !== 'intro' && !scenarioComplete
   const hasRewards = playerWon && !scenarioComplete && rewardChoices.length > 0
   const rewardSelected = selectedRewardId !== null && rewardChoices.includes(selectedRewardId)
   const nextBattleIndex =
@@ -54,7 +55,7 @@ const ScenarioProgressDialog = ({
     result === 'intro'
       ? 'シナリオ開始'
       : scenarioComplete
-        ? 'シナリオクリア'
+        ? '全勝'
         : playerWon
           ? '勝利'
           : '敗北'
@@ -86,10 +87,10 @@ const ScenarioProgressDialog = ({
         transition={{ delay: 0.06, duration: 0.34, ease: 'easeOut' }}
       >
         <header className="scenario-result-header">
-          <h2 id="scenario-result-title" aria-label={result === 'loss' ? title : undefined}>
-            {result === 'loss'
+          <h2 id="scenario-result-title" aria-label={animateResultTitle ? title : undefined}>
+            {animateResultTitle
               ? [...title].map((letter) => (
-                  <span key={letter} className="scenario-result-loss-letter" aria-hidden="true">
+                  <span key={letter} className="scenario-result-letter" aria-hidden="true">
                     {letter}
                   </span>
                 ))

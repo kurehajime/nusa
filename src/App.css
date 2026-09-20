@@ -740,17 +740,17 @@
   font-weight: 700;
 }
 
-.scenario-result-loss-letter {
+.scenario-result-letter {
   display: inline-block;
   transform-origin: 50% 25%;
-  animation: scenario-loss-stamp 560ms linear 200ms both;
+  animation: scenario-result-stamp 560ms linear 200ms both;
 }
 
-.scenario-result-loss-letter:nth-child(2) {
+.scenario-result-letter:nth-child(2) {
   animation-delay: 680ms;
 }
 
-@keyframes scenario-loss-stamp {
+@keyframes scenario-result-stamp {
   0% {
     opacity: 0;
     transform: scale(2.2);
@@ -3076,7 +3076,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scenario-result-loss-letter {
+  .scenario-result-letter {
     animation: none;
   }
 
