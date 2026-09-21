@@ -1,25 +1,9 @@
 @font-face {
-  font-family: 'Shippori Mincho';
+  font-family: 'Yusei Magic';
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('@fontsource/shippori-mincho/files/shippori-mincho-japanese-400-normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Shippori Mincho';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 600;
-  src: url('@fontsource/shippori-mincho/files/shippori-mincho-japanese-600-normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Shippori Mincho';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 800;
-  src: url('@fontsource/shippori-mincho/files/shippori-mincho-japanese-800-normal.woff2') format('woff2');
+  src: url('@fontsource/yusei-magic/files/yusei-magic-japanese-400-normal.woff2') format('woff2');
 }
 
 @font-face {
@@ -1962,7 +1946,7 @@
   border-radius: 8px;
   background: #fcfdff;
   color: #171a17;
-  font-family: 'Shippori Mincho', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+  font-family: 'Yusei Magic', 'Hiragino Kaku Gothic ProN', sans-serif;
   text-align: left;
   overflow: visible;
   isolation: isolate;
@@ -2156,7 +2140,7 @@
 .card-face-kind-mark text,
 .card-face-modifier text {
   font-family: inherit;
-  font-weight: 900;
+  font-weight: 400;
   letter-spacing: 0;
   text-anchor: middle;
   dominant-baseline: middle;
@@ -2174,7 +2158,7 @@
   align-items: center;
   color: #171a17;
   font-size: 38px;
-  font-weight: 900;
+  font-weight: 400;
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
@@ -2277,9 +2261,9 @@
   width: 100%;
   height: 100%;
   color: #252a26;
-  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-family: inherit;
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.35;
   letter-spacing: 0;
   overflow: hidden;
@@ -2308,7 +2292,7 @@
 
 .card-face-stat-value {
   fill: #fff;
-  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-family: inherit;
   font-size: 54px;
 }
 
@@ -2337,12 +2321,8 @@
 
 .card-face-modifier text {
   fill: #fff;
-  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-family: inherit;
   font-size: 27px;
-}
-
-.card-face-cost-text {
-  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
 }
 
 .card-compact {
@@ -2363,7 +2343,7 @@
   border-radius: 8px;
   box-shadow: 0 8px 24px rgb(18 22 19 / 24%);
   color: #171a17;
-  font-family: 'Shippori Mincho', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+  font-family: 'Yusei Magic', 'Hiragino Kaku Gothic ProN', sans-serif;
   text-align: left;
   overflow-y: auto;
   pointer-events: none;
