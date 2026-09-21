@@ -394,7 +394,7 @@ const BoardGroupButton = ({
         onAttack?.(group.startIndex, group.endIndex)
       }}
     >
-      {spellTargetAction ? '対象 / ' : ''}攻{group.attack} / 防{group.defense}
+      {spellTargetAction ? '対象' : `攻${group.attack} / 防${group.defense}`}
     </motion.button>
   )
 }
