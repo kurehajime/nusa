@@ -20,6 +20,11 @@
   --surface-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.58' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
+.setup-shell,
+.game-shell {
+  --table-surface-tint: rgb(255 254 248 / 52%);
+}
+
 .setup-shell {
   position: relative;
   isolation: isolate;
@@ -42,7 +47,7 @@
   z-index: -1;
   background-color: var(--table-background-color, #b9e6f2);
   background-image:
-    linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)),
+    linear-gradient(var(--table-surface-tint, rgb(255 255 255 / 10%)), var(--table-surface-tint, rgb(255 255 255 / 10%))),
     var(--table-background-image, none);
   filter: saturate(110%);
   pointer-events: none;
