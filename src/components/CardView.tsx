@@ -263,7 +263,7 @@ const CardFace = ({
       <text className="card-face-cost-text" x="55" y="57">
         {card.cost}
       </text>
-      <foreignObject x="110" y="28" width="365" height="52">
+      <foreignObject x="110" y="20" width="365" height="60">
         <div className="card-face-name">{card.name}</div>
       </foreignObject>
 
