@@ -435,6 +435,9 @@
 }
 
 .game-shell {
+  --action-button-shadow: 0 3px 0 rgb(18 22 19 / 25%), 0 6px 10px rgb(18 22 19 / 36%);
+  --action-button-filter: drop-shadow(0 3px 2px rgb(18 22 19 / 38%)) drop-shadow(0 5px 5px rgb(18 22 19 / 28%));
+
   position: relative;
   isolation: isolate;
   min-height: 100svh;
@@ -1271,7 +1274,7 @@
 .board-spell>.card-view {
   width: 140px;
   max-width: 100%;
-  --card-surface-shadow: 0 12px 24px rgb(18 22 19 / 68%);
+  --card-surface-shadow: 0 2px 1px rgb(18 22 19 / 45%);
 }
 
 .board-spell-empty>.card-empty {
@@ -1359,7 +1362,7 @@
   row-gap: 8px;
   align-items: stretch;
   justify-content: safe center;
-  /* Leave room below the lower army for the card shadow inside the scroller. */
+  /* Leave room below the lower army for the action shadows inside the scroller. */
   padding-bottom: 48px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -1400,7 +1403,7 @@
 
 .board-card-content>.card-view {
   width: 100%;
-  --card-surface-shadow: 0 12px 24px rgb(18 22 19 / 68%);
+  --card-surface-shadow: 0 2px 1px rgb(18 22 19 / 45%);
 }
 
 .board-ability-actions {
@@ -1427,6 +1430,7 @@
 
 .board-ability-actions button:not(:disabled) {
   cursor: pointer;
+  box-shadow: var(--action-button-shadow);
 }
 
 .board-ability-actions button:disabled {
@@ -1441,18 +1445,18 @@
 }
 
 .board-ability-actions .board-spell-target-button {
+  --button-background: #653f68;
+  --button-shape: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
+
   min-height: 26px;
   padding: 3px 12px;
   border: 0;
   border-radius: 0;
-  background: #653f68;
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
-  filter: drop-shadow(0 3px 4px rgb(25 12 24 / 48%));
   color: #fff7e9;
 }
 
 .board-ability-actions .board-spell-target-button:hover {
-  background: #79507c;
+  --button-background: #79507c;
 }
 
 .damage-marker {
@@ -1604,13 +1608,17 @@
   outline-offset: 3px;
 }
 
+.board-insert-slot:not(:disabled) {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 18%), var(--action-button-shadow);
+}
+
 .board-group-button {
+  --button-background: #26342f;
+
   container-type: inline-size;
   min-height: 30px;
   border: 0;
   border-radius: 0;
-  background: #26342f;
-  filter: drop-shadow(0 0 1px #2d3f38);
   color: #f8fbf5;
   font-size: 20px;
   font-weight: 800;
@@ -1629,15 +1637,15 @@
 }
 
 .board-group-playerB {
+  --button-shape: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%);
   align-self: end;
   padding: 4px 12px 4px 22px;
-  clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%);
 }
 
 .board-group-playerA {
+  --button-shape: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
   align-self: start;
   padding: 4px 22px 4px 12px;
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
 }
 
 .board-group-button:not(:disabled) {
@@ -1645,22 +1653,46 @@
 }
 
 .board-group-button.board-group-spell-target {
+  --button-background: #653f68;
+  --button-shape: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
   padding: 4px 18px;
   font-size: 22px;
-  background: #653f68;
-  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
-  filter: drop-shadow(0 3px 5px rgb(25 12 24 / 52%));
   color: #fff7e9;
 }
 
 .board-group-button.board-group-spell-target:hover {
-  background: #79507c;
+  --button-background: #79507c;
 }
 
 .board-group-button:disabled {
-  background: #d9dfd4;
-  filter: drop-shadow(0 0 1px #b9c2b5);
+  --button-background: #d9dfd4;
   color: #778174;
+}
+
+/* Clip only the fill so the button's shadow can extend past its arrow shape. */
+.board-group-button,
+.board-ability-actions .board-spell-target-button {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+  box-shadow: none;
+}
+
+.board-group-button::before,
+.board-ability-actions .board-spell-target-button::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(--button-background);
+  clip-path: var(--button-shape);
+  pointer-events: none;
+}
+
+.board-group-button:not(:disabled),
+.board-ability-actions .board-spell-target-button:not(:disabled) {
+  filter: var(--action-button-filter);
+  box-shadow: none;
 }
 
 .board-group-button:focus-visible {
@@ -1756,7 +1788,7 @@
   border: 2px solid #d9dfd4;
   border-radius: 8px;
   background: #26342f;
-  box-shadow: 0 8px 18px rgb(18 12 9 / 34%);
+  box-shadow: var(--action-button-shadow);
   color: #f8fbf5;
   font-size: 24px;
   font-weight: 800;
@@ -1814,7 +1846,7 @@
   border: 2px solid #f8fbf5;
   border-radius: 6px;
   background: #26342f;
-  box-shadow: 0 5px 12px rgb(18 12 9 / 42%);
+  box-shadow: var(--action-button-shadow);
   color: #f8fbf5;
   font-size: 20px;
   font-weight: 800;
@@ -1841,7 +1873,7 @@
   border: 0;
   border-radius: 50%;
   background: rgb(37 30 26 / 88%);
-  box-shadow: 0 3px 8px rgb(18 12 9 / 32%);
+  box-shadow: var(--action-button-shadow);
   transition: background-color 120ms ease, opacity 120ms ease, transform 120ms ease;
 }
 
@@ -1866,6 +1898,7 @@
 }
 
 .hand-discard-button:disabled {
+  box-shadow: none;
   opacity: 0.28;
 }
 
@@ -2699,7 +2732,7 @@
   .board-lane-grid {
     --board-card-width: 164px;
 
-    /* The attack row adds 38px beneath the card; 12px completes the shadow room. */
+    /* Preserve space below the attack row for the action shadows. */
     padding-bottom: 12px;
   }
 
@@ -2793,6 +2826,9 @@
   }
 
   .game-shell {
+    --action-button-shadow: 0 2px 0 rgb(18 22 19 / 25%), 0 4px 6px rgb(18 22 19 / 36%);
+    --action-button-filter: drop-shadow(0 2px 1px rgb(18 22 19 / 38%)) drop-shadow(0 3px 3px rgb(18 22 19 / 28%));
+
     padding:
       calc(12px + env(safe-area-inset-top, 0px))
       calc(12px + env(safe-area-inset-right, 0px))
@@ -2968,7 +3004,6 @@
   .board-spell > .card-view {
     width: 52px;
     max-width: 100%;
-    --card-surface-shadow: 0 6px 12px rgb(18 22 19 / 65%);
   }
 
   .board-spell {
@@ -3012,10 +3047,6 @@
     width: calc(100% + 24px);
   }
 
-  .board-card-content > .card-view {
-    --card-surface-shadow: 0 6px 12px rgb(18 22 19 / 65%);
-  }
-
   .board-insert-slot {
     min-height: 0;
     aspect-ratio: 5 / 7;
@@ -3042,12 +3073,12 @@
 
   .board-group-playerB {
     padding: 3px 5px 3px 10px;
-    clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
+    --button-shape: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
   }
 
   .board-group-playerA {
     padding: 3px 10px 3px 5px;
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+    --button-shape: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
   }
 
   .board-group-button.board-group-spell-target {
