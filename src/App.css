@@ -2147,6 +2147,7 @@
 
 .card-face-cost-circle {
   fill: var(--card-accent);
+  filter: var(--card-cost-filter);
 }
 
 .card-face-cost-text,
@@ -2243,8 +2244,13 @@
   stroke-width: 6;
 }
 
+.card-face-art-background,
 .card-face-art-frame,
-.card-face-rules-frame {
+.card-face-rules-frame,
+.card-face-type-band,
+.card-face-stats rect,
+.card-face-kind-mark rect,
+.card-face-modifier circle {
   filter: var(--card-frame-filter);
   stroke-linecap: round;
   stroke-linejoin: round;
