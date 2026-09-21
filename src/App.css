@@ -729,7 +729,7 @@
     0 5px 18px rgb(10 4 2 / 80%);
 }
 
-.scenario-result-dialog:is([data-result='win'], [data-result='loss'])
+.scenario-result-dialog:is([data-result='win'], [data-result='loss'], [data-result='complete'])
   .scenario-result-header h2 {
   font-size: 72px;
 }
@@ -2243,6 +2243,13 @@
   stroke-width: 6;
 }
 
+.card-face-art-frame,
+.card-face-rules-frame {
+  filter: var(--card-frame-filter);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .card-face-type-band {
   fill: var(--card-accent-dark);
 }
@@ -2788,7 +2795,7 @@
     font-size: 34px;
   }
 
-  .scenario-result-dialog:is([data-result='win'], [data-result='loss'])
+  .scenario-result-dialog:is([data-result='win'], [data-result='loss'], [data-result='complete'])
     .scenario-result-header h2 {
     font-size: 56px;
   }

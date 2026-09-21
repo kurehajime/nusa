@@ -112,6 +112,7 @@ const CardFace = ({
   const artClipId = `card-art-clip-${artId}`
   const artColorFilterId = `card-art-color-${artId}`
   const artJitterFilterId = `card-art-jitter-${artId}`
+  const frameSketchFilterId = `card-frame-sketch-${artId}`
   const artUrl = getCardArtUrl(card)
   const isSpell = card.kind === 'spell'
   const typeLabel = isSpell
@@ -142,11 +143,35 @@ const CardFace = ({
   return (
     <svg
       className="card-face"
+      style={{ '--card-frame-filter': `url(#${frameSketchFilterId})` } as CSSProperties}
       viewBox="0 0 500 700"
       preserveAspectRatio="xMidYMid meet"
       aria-hidden="true"
     >
       <defs>
+        <filter
+          id={frameSketchFilterId}
+          x="-5%"
+          y="-10%"
+          width="110%"
+          height="120%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.018 0.035"
+            numOctaves="2"
+            seed="7"
+            result="grain"
+          />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="grain"
+            scale="7"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
         <clipPath id={artClipId}>
           <rect x="28" y="86" width="444" height="259" rx="9" />
         </clipPath>

@@ -37,7 +37,7 @@ const ScenarioProgressDialog = ({
   const playerWon = result === 'win'
   const scenarioComplete =
     playerWon && currentBattleIndex === opponentDeckIds.length - 1
-  const animateResultTitle = result !== 'intro' && !scenarioComplete
+  const animateResultTitle = result !== 'intro'
   const hasRewards = playerWon && !scenarioComplete && rewardChoices.length > 0
   const rewardSelected = selectedRewardId !== null && rewardChoices.includes(selectedRewardId)
   const nextBattleIndex =
