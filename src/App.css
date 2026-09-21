@@ -2583,26 +2583,22 @@
   .board-player {
     position: relative;
     z-index: 1;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto;
     align-items: center;
     gap: 8px;
   }
 
   .board-player-playerA {
     grid-area: player-a;
-    grid-template-columns: 108px 117px auto minmax(0, 1fr);
-    grid-template-areas:
-      'endpoint stats spell .'
-      'endpoint graveyard spell .';
+    grid-template-columns: 72px 117px auto auto minmax(0, 1fr);
+    grid-template-areas: 'endpoint stats graveyard spell .';
     padding: 0 22px 0 24px;
   }
 
   .board-player-playerB {
     grid-area: player-b;
-    grid-template-columns: minmax(0, 1fr) auto 117px 108px;
-    grid-template-areas:
-      '. spell stats endpoint'
-      '. spell graveyard endpoint';
+    grid-template-columns: minmax(0, 1fr) auto auto 117px 72px;
+    grid-template-areas: '. spell graveyard stats endpoint';
     padding: 0 24px 0 22px;
   }
 
@@ -2623,10 +2619,25 @@
 
   .board-endpoint {
     grid-area: endpoint;
+    width: min(72px, 100%);
+    border-width: 5px;
+    font-size: 11px;
+  }
+
+  .board-player-identity {
+    right: 2px;
+    left: 2px;
+  }
+
+  .board-player-barrier {
+    font-size: 9px;
+    white-space: nowrap;
   }
 
   .graveyard-summary {
     grid-area: graveyard;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .board-spell {
@@ -2634,13 +2645,21 @@
   }
 
   .board-spell > .card-view {
-    width: 108px;
+    width: 72px;
     max-width: 100%;
   }
 
   .board-spell-empty > .card-empty {
-    width: 108px;
+    width: 72px;
     opacity: 0.68;
+  }
+
+  .spell-exile-token {
+    top: 5px;
+    right: 2px;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
   }
 
   .board-lane-scroll {
@@ -2817,26 +2836,22 @@
   .board-player {
     position: relative;
     z-index: 1;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto;
     align-items: center;
     gap: 4px;
   }
 
   .board-player-playerA {
     grid-area: player-a;
-    grid-template-columns: 52px 64px auto minmax(0, 1fr);
-    grid-template-areas:
-      'endpoint stats spell .'
-      'endpoint graveyard spell .';
+    grid-template-columns: 52px 64px auto auto minmax(0, 1fr);
+    grid-template-areas: 'endpoint stats graveyard spell .';
     padding: 0 8px 8px 10px;
   }
 
   .board-player-playerB {
     grid-area: player-b;
-    grid-template-columns: minmax(0, 1fr) auto 64px 52px;
-    grid-template-areas:
-      '. spell stats endpoint'
-      '. spell graveyard endpoint';
+    grid-template-columns: minmax(0, 1fr) auto auto 64px 52px;
+    grid-template-areas: '. spell graveyard stats endpoint';
     padding: 8px 10px 0 8px;
   }
 
@@ -2899,6 +2914,7 @@
 
   .graveyard-summary {
     grid-area: graveyard;
+    flex-direction: column;
     gap: 2px;
     padding: 0;
   }
