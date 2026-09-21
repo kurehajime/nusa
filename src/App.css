@@ -2674,12 +2674,19 @@
   }
 
   .board-lane-grid {
+    --board-card-width: 164px;
+
     /* The attack row adds 38px beneath the card; 12px completes the shadow room. */
     padding-bottom: 12px;
   }
 
   .hand-panel-bottom {
+    grid-template-columns: repeat(5, minmax(0, 164px));
     padding: 32px 10px 6px;
+  }
+
+  .player-hand-row {
+    grid-template-columns: 112px minmax(0, 880px) 112px;
   }
 
 }
@@ -2709,7 +2716,7 @@
   }
 
   .player-hand-row {
-    grid-template-columns: 96px minmax(0, 740px) 96px;
+    grid-template-columns: 96px minmax(0, 880px) 96px;
     gap: 12px;
   }
 
