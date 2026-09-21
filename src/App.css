@@ -54,6 +54,8 @@
 }
 
 .setup-panel {
+  position: relative;
+  z-index: 1;
   width: min(920px, 100%);
   margin-inline: auto;
 }
@@ -87,9 +89,19 @@
   padding: 20px;
   border: 1px solid #9aa596;
   border-radius: 8px;
-  background: #fbfcf8;
+  background: rgb(251 252 248 / 78%);
   color: #171a17;
   box-shadow: 0 8px 24px rgb(36 23 16 / 16%);
+}
+
+.menu-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Keep each menu's backdrop below the persistent demo, and its panel above it. */
+.menu-shell > .setup-shell {
+  isolation: auto;
 }
 
 .title-screen {
@@ -127,7 +139,6 @@
   width: min(420px, 100%);
   padding: 28px;
   gap: 20px;
-  background: rgb(251 252 248 / 92%);
 }
 
 .title-mode-panel h2 {

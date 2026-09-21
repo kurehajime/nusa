@@ -26,6 +26,7 @@ import GameSetup, {
 } from './GameSetup'
 import ScenarioProgressDialog from './ScenarioProgressDialog'
 import TitleScreen from './TitleScreen'
+import TitleDemo from './TitleDemo'
 
 const COMBAT_EFFECT_DURATION_MS = 500
 const AI_ACTION_DELAY_MS = 700
@@ -464,28 +465,29 @@ const GameApp = () => {
     })
   }
 
-  if (screen === 'title') {
+  if (screen !== 'game') {
     return (
-      <TitleScreen
-        playerDeckId={selection.playerDeckId}
-        onSelectMode={(mode) => {
-          setSetupMode(mode)
-          setScreen('setup')
-        }}
-      />
-    )
-  }
-
-  if (screen === 'setup') {
-    return (
-      <GameSetup
-        mode={setupMode}
-        initialPlayerDeckId={selection.playerDeckId}
-        initialComDeckId={selection.comDeckId}
-        initialDifficulty={selection.difficulty}
-        onStart={startGame}
-        onBack={returnToTitle}
-      />
+      <div className="menu-shell">
+        <TitleDemo />
+        {screen === 'title' ? (
+          <TitleScreen
+            playerDeckId={selection.playerDeckId}
+            onSelectMode={(mode) => {
+              setSetupMode(mode)
+              setScreen('setup')
+            }}
+          />
+        ) : (
+          <GameSetup
+            mode={setupMode}
+            initialPlayerDeckId={selection.playerDeckId}
+            initialComDeckId={selection.comDeckId}
+            initialDifficulty={selection.difficulty}
+            onStart={startGame}
+            onBack={returnToTitle}
+          />
+        )}
+      </div>
     )
   }
 
