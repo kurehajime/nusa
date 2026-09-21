@@ -1,5 +1,7 @@
 :root {
-  font: 16px/1.45 system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-text: 'Yusei Magic', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-numbers: 'Slackey', var(--font-text);
+  font: 16px/1.45 var(--font-text);
   letter-spacing: 0;
   color: #17140f;
   background: #b9e6f2;
@@ -25,7 +27,10 @@ body {
   overflow-x: hidden;
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font: inherit;
 }
 

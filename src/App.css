@@ -1,4 +1,4 @@
-/* Slackey is reserved for cost and combat-stat numerals. */
+/* Apply Slackey only to numeric displays; prose keeps Yusei Magic. */
 @font-face {
   font-family: 'Slackey';
   font-style: normal;
@@ -14,30 +14,6 @@
   font-display: swap;
   font-weight: 400;
   src: url('@fontsource/yusei-magic/files/yusei-magic-japanese-400-normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Noto Sans JP';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 600;
-  src: url('@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-600-normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Noto Sans JP';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 900;
-  src: url('@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-900-normal.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Dela Gothic One';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 400;
-  src: url('@fontsource/dela-gothic-one/files/dela-gothic-one-japanese-400-normal.woff2') format('woff2');
 }
 
 :root {
@@ -88,7 +64,7 @@
 
 .setup-header h1 {
   margin: 0;
-  font-family: 'Dela Gothic One', 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 32px;
   font-weight: 400;
   line-height: 1;
@@ -230,7 +206,7 @@
   box-shadow: 0 3px 8px rgb(36 23 16 / 44%);
   color: #fff;
   content: '✓';
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 16px;
   font-weight: 900;
   line-height: 1;
@@ -551,7 +527,7 @@
 
 .game-header h1 {
   margin: 0;
-  font-family: 'Dela Gothic One', 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 28px;
   font-weight: 400;
   line-height: 1;
@@ -594,7 +570,7 @@
   grid-column: 2;
   margin: 0;
   color: #fff;
-  font-family: 'Dela Gothic One', 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 96px;
   font-weight: 400;
   line-height: 1.15;
@@ -713,7 +689,7 @@
 }
 
 .scenario-result-header h2 {
-  font-family: 'Dela Gothic One', 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 42px;
   font-weight: 400;
   line-height: 1.1;
@@ -862,7 +838,7 @@
   display: grid;
   place-items: center;
   color: #fff;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 88px;
   font-weight: 900;
   line-height: 1;
@@ -1261,7 +1237,7 @@
   border-radius: 50%;
   box-shadow: 0 2px 4px rgb(31 19 12 / 38%);
   color: #fff;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 12px;
   font-weight: 800;
   line-height: 1;
@@ -1311,7 +1287,7 @@
   border-radius: 50%;
   box-shadow: 0 4px 9px rgb(31 19 12 / 46%);
   color: #fff;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: var(--font-text);
   font-size: 17px;
   font-weight: 900;
   line-height: 1;
@@ -1956,7 +1932,7 @@
   border-radius: 8px;
   background: #fcfdff;
   color: #171a17;
-  font-family: 'Yusei Magic', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-family: var(--font-text);
   text-align: left;
   overflow: visible;
   isolation: isolate;
@@ -2338,8 +2314,16 @@
 .card-face-cost-text,
 .card-face-stat-value,
 .card-detail-popover .card-cost,
-.card-detail-popover .card-stats dd {
-  font-family: 'Slackey', 'Yusei Magic', 'Hiragino Kaku Gothic ProN', sans-serif;
+.card-detail-popover .card-stats dd,
+.board-player-stats dd,
+.board-player-barrier,
+.board-group-button,
+.graveyard-count,
+.spell-exile-token,
+.damage-marker,
+.scenario-opponent-order,
+.scenario-reward-choice > span:not(.scenario-reward-selection) {
+  font-family: var(--font-numbers);
 }
 
 .card-compact {
@@ -2360,7 +2344,7 @@
   border-radius: 8px;
   box-shadow: 0 8px 24px rgb(18 22 19 / 24%);
   color: #171a17;
-  font-family: 'Yusei Magic', 'Hiragino Kaku Gothic ProN', sans-serif;
+  font-family: var(--font-text);
   text-align: left;
   overflow-y: auto;
   pointer-events: none;
