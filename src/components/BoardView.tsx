@@ -237,7 +237,6 @@ const BoardPlayer = ({
           aria-hidden="true"
         />
         <span className="board-player-identity">
-          <span>{player.name}</span>
           <small className="board-player-barrier">(シールド:{barrier})</small>
         </span>
         {damage !== null && (
@@ -374,7 +373,8 @@ const BoardGroupButton = ({
       style={{
         gridColumn: `${group.startIndex * 2 + 2} / ${group.endIndex * 2 + 3}`,
         gridRow: group.ownerId === 'playerB' ? 1 : 5,
-      }}
+        '--group-label-units': 4.2 + Math.max(0, `${group.attack}${group.defense}`.length - 2) * 0.8,
+      } as CSSProperties}
       animate={animationControls}
       type="button"
       aria-label={
@@ -394,7 +394,9 @@ const BoardGroupButton = ({
         onAttack?.(group.startIndex, group.endIndex)
       }}
     >
-      {spellTargetAction ? '対象' : `攻${group.attack} / 防${group.defense}`}
+      <span className="board-group-label">
+        {spellTargetAction ? '対象' : `攻${group.attack} / 防${group.defense}`}
+      </span>
     </motion.button>
   )
 }

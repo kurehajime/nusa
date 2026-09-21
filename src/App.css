@@ -100,7 +100,7 @@
   border-bottom: 4px solid transparent;
   background: transparent;
   color: #667066;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -424,6 +424,7 @@
   border-radius: 8px;
   background: #26342f;
   color: #f8fbf5;
+  font-size: 22px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -602,7 +603,7 @@
   background: #f4eee5;
   box-shadow: 0 8px 20px rgb(20 10 6 / 46%);
   color: #26342f;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 900;
   transition: background-color 120ms ease, transform 120ms ease;
 }
@@ -934,7 +935,7 @@
   background: #f4eee5;
   box-shadow: 0 8px 20px rgb(20 10 6 / 46%);
   color: #26342f;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 900;
   transition: background-color 120ms ease, transform 120ms ease;
 }
@@ -1042,6 +1043,11 @@
 }
 
 @media (max-width: 720px) {
+  .setup-mode-tabs button {
+    padding-inline: 6px;
+    font-size: 16px;
+  }
+
   .scenario-result-dialog {
     max-height: calc(100dvh - 24px);
   }
@@ -1414,8 +1420,9 @@
   border-radius: 5px;
   background: #26342f;
   color: #f8fbf5;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 800;
+  line-height: 1.2;
 }
 
 .board-ability-actions button:not(:disabled) {
@@ -1546,6 +1553,8 @@
   border-radius: 8px;
   background: #eeeeea;
   color: #3d3d39;
+  padding-inline: 0;
+  font-size: 24px;
   font-weight: 800;
 }
 
@@ -1556,6 +1565,7 @@
   aspect-ratio: 5 / 7;
   grid-row: 3 / 5;
   justify-self: center;
+  font-size: 32px;
 }
 
 .board-insert-slot:not(:disabled) {
@@ -1595,27 +1605,38 @@
 }
 
 .board-group-button {
+  container-type: inline-size;
   min-height: 30px;
   border: 0;
   border-radius: 0;
   background: #26342f;
   filter: drop-shadow(0 0 1px #2d3f38);
   color: #f8fbf5;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
 }
 
+.board-group-label {
+  /* Reserve more width for each additional Slackey digit. */
+  display: block;
+  font-size: min(20px, calc(100cqw / var(--group-label-units, 4.2)));
+}
+
+.board-group-spell-target .board-group-label {
+  font-size: min(22px, 45cqw);
+}
+
 .board-group-playerB {
   align-self: end;
-  padding: 6px 12px 6px 22px;
+  padding: 4px 12px 4px 22px;
   clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%);
 }
 
 .board-group-playerA {
   align-self: start;
-  padding: 6px 22px 6px 12px;
+  padding: 4px 22px 4px 12px;
   clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
 }
 
@@ -1624,7 +1645,8 @@
 }
 
 .board-group-button.board-group-spell-target {
-  padding: 6px 18px;
+  padding: 4px 18px;
+  font-size: 22px;
   background: #653f68;
   clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
   filter: drop-shadow(0 3px 5px rgb(25 12 24 / 52%));
@@ -1730,13 +1752,13 @@
 .turn-end-button {
   width: 112px;
   min-height: 112px;
-  padding: 14px;
+  padding: 10px;
   border: 2px solid #d9dfd4;
   border-radius: 8px;
   background: #26342f;
   box-shadow: 0 8px 18px rgb(18 12 9 / 34%);
   color: #f8fbf5;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1.35;
   transition: background-color 120ms ease, transform 120ms ease, opacity 120ms ease;
@@ -1794,8 +1816,9 @@
   background: #26342f;
   box-shadow: 0 5px 12px rgb(18 12 9 / 42%);
   color: #f8fbf5;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 800;
+  line-height: 1;
   transform: translateX(-50%);
 }
 
@@ -2997,12 +3020,24 @@
     min-height: 0;
     aspect-ratio: 5 / 7;
     border-radius: 4px;
-    font-size: 9px;
+    font-size: 14px;
+  }
+
+  .board-insert-slot-empty {
+    font-size: 20px;
   }
 
   .board-group-button {
     min-height: 20px;
     font-size: 11px;
+  }
+
+  .board-group-label {
+    font-size: min(14px, calc(100cqw / var(--group-label-units, 4.2)));
+  }
+
+  .board-group-spell-target .board-group-label {
+    font-size: min(14px, 45cqw);
   }
 
   .board-group-playerB {
@@ -3013,6 +3048,11 @@
   .board-group-playerA {
     padding: 3px 10px 3px 5px;
     clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+  }
+
+  .board-group-button.board-group-spell-target {
+    padding: 3px 12px;
+    font-size: 14px;
   }
 
   .board-ability-actions {
@@ -3026,7 +3066,7 @@
   .board-ability-actions .board-spell-target-button {
     min-height: 15px;
     padding: 1px 3px;
-    font-size: 7px;
+    font-size: 9px;
   }
 
   .damage-marker {
@@ -3063,7 +3103,7 @@
     min-width: 52px;
     min-height: 30px;
     padding: 2px 6px;
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .player-hand-row {
@@ -3079,7 +3119,7 @@
     width: 100%;
     min-height: 52px;
     padding: 8px 16px;
-    font-size: 16px;
+    font-size: 22px;
   }
 
   .turn-end-button br {
