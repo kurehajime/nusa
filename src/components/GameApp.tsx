@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { LayoutGroup, motion, MotionConfig } from 'motion/react'
+import { motion } from 'motion/react'
 import {
   GameAI,
   GameManager,
@@ -18,15 +18,14 @@ import {
   type PlayerId,
   type ThemeDeckId,
 } from '../game'
-import BoardView, { type BoardAttackAnimation } from './BoardView'
+import type { BoardAttackAnimation } from './BoardView'
+import BattleScene from './BattleScene'
 import GameSetup, {
   type BattleMode,
   type GameSetupSelection,
 } from './GameSetup'
-import HandView from './HandView'
 import ScenarioProgressDialog from './ScenarioProgressDialog'
 import TitleScreen from './TitleScreen'
-import { getDeckBackgroundStyle } from './deckBackground'
 
 const COMBAT_EFFECT_DURATION_MS = 500
 const AI_ACTION_DELAY_MS = 700
@@ -124,67 +123,11 @@ const GameSession = ({
     createGameUiState,
   )
   const { state } = manager
-  const playerA = state.players.playerA
-  const playerB = state.players.playerB
   const winnerId = GameManager.getWinner(manager)
   const winnerMessage =
     winnerId === null || scenarioRun !== null
       ? null
       : `${state.players[winnerId].name}の勝利`
-  const currentPlayer = GameManager.getCurrentPlayer(manager)
-  const selectedCard = selectedCardId === null ? null : state.cards[selectedCardId] ?? null
-  const playerAHand = playerA.hand.map((cardId) => state.cards[cardId])
-  const playerBHand = playerB.hand.map((cardId) => state.cards[cardId])
-  const boardGroups = GameManager.getBoardGroups(manager)
-  const creatureStatModifiers = Object.fromEntries(
-    state.board.creatures.map(({ cardId }) => [
-      cardId,
-      GameManager.getCreatureStatModifier(manager, cardId),
-    ]),
-  )
-  const selectedSummonOptions =
-    selectedCard?.card.kind === 'creature'
-      ? GameManager.getSummonOptions(manager, selectedCard.id)
-      : []
-  const selectedSpellActions =
-    selectedCard?.card.kind === 'spell'
-      ? GameManager.getSpellPlayActions(manager, selectedCard.id)
-      : []
-  const selectedSpellTargetActions = selectedSpellActions.filter(
-    (action) => action.target !== undefined,
-  )
-  const playableCardIds = new Set(
-    currentPlayer.hand.filter((cardId) => GameManager.isCardPlayable(manager, cardId)),
-  )
-  const directlyPlayableSpellIds = new Set(
-    currentPlayer.hand.filter((cardId) =>
-      GameManager.getSpellPlayActions(manager, cardId).some(
-        (action) => action.target === undefined,
-      ),
-    ),
-  )
-  const discardableCardIds = new Set<CardInstanceId>(
-    state.activePlayerId === 'playerA' &&
-      state.phase === 'main' &&
-      !state.hasDiscardedThisTurn &&
-      state.pendingCombat === null &&
-      winnerId === null
-      ? playerA.hand
-      : [],
-  )
-  const activatedAbilities = GameManager.getActivatedAbilities(manager)
-  const playerDamageMarker =
-    state.pendingCombat?.playerWasHit === true
-      ? {
-        playerId: state.pendingCombat.defendingPlayerId,
-        damage: state.pendingCombat.playerDamage,
-      }
-      : null
-  const manaRefundCardIds =
-    state.pendingCombat?.destroyedCardIds.filter(
-      (cardId) => GameManager.getDestructionManaRefund(manager, cardId) > 0,
-    ) ?? []
-
   useEffect(() => {
     if (!state.pendingCombat) {
       return
@@ -361,181 +304,82 @@ const GameSession = ({
   }
 
   return (
-    <MotionConfig
-      reducedMotion="user"
-      transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.8 }}
+    <BattleScene
+      manager={manager}
+      playerDeckId={playerDeckId}
+      comDeckId={comDeckId}
+      selectedCardId={selectedCardId}
+      message={message}
+      attackAnimation={attackAnimation}
+      onCardClick={handleCardClick}
+      onInsertClick={handleInsertClick}
+      onGroupAttack={handleGroupAttack}
+      onActivateAbility={handleActivateAbility}
+      onPlaySpellTarget={handlePlaySpellTarget}
+      onDiscardCard={handleDiscardCard}
+      onPlaySpell={handlePlaySpell}
+      onPassPhase={handlePassPhase}
     >
-      <LayoutGroup id="game-card-layout">
-        <main
-          className="game-shell"
-          style={getDeckBackgroundStyle(comDeckId)}
+      {winnerMessage !== null && (
+        <motion.div
+          className="game-result-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
         >
-          <header className="game-header">
-            <h1>nusa</h1>
-          </header>
-          {message && winnerId === null && (
-            <div className="game-message" role="status">
-              {message}
-            </div>
-          )}
-          <HandView
-            cards={playerBHand}
-            faceDown
-            playerName={playerB.name}
-            position="top"
-            playableCardIds={undefined}
-            active={state.activePlayerId === 'playerB'}
-            disabled
-            selectedCardId={null}
-            onCardClick={handleCardClick}
-          />
-          <BoardView
-            board={state.board}
-            cards={state.cards}
-            damageMarkers={state.pendingCombat?.damageMarkers ?? []}
-            destroyedCardIds={state.pendingCombat?.destroyedCardIds ?? []}
-            manaRefundCardIds={manaRefundCardIds}
-            playerDamageMarker={playerDamageMarker}
-            players={state.players}
-            playerBarriers={{
-              playerA: GameManager.getPlayerBarrier(manager, 'playerA'),
-              playerB: GameManager.getPlayerBarrier(manager, 'playerB'),
-            }}
-            playerDeckColors={{
-              playerA: THEME_DECK_BY_ID[playerDeckId].colors,
-              playerB: THEME_DECK_BY_ID[comDeckId].colors,
-            }}
-            playerDeckIds={{
-              playerA: playerDeckId,
-              playerB: comDeckId,
-            }}
-            activePlayerId={state.activePlayerId}
-            groups={boardGroups}
-            creatureStatModifiers={creatureStatModifiers}
-            summonOptions={selectedSummonOptions}
-            spellTargetActions={selectedSpellTargetActions}
-            activatedAbilities={
-              state.activePlayerId === 'playerA' && winnerId === null
-                ? activatedAbilities
-                : []
-            }
-            attackAnimation={attackAnimation}
-            canAttack={
-              state.activePlayerId === 'playerA' &&
-              ['main', 'battle'].includes(state.phase) &&
-              !state.hasAttackedThisTurn &&
-              GameManager.canCurrentPlayerAttack(manager) &&
-              state.pendingCombat === null &&
-              winnerId === null
-            }
-            onInsertClick={handleInsertClick}
-            onGroupAttack={handleGroupAttack}
-            onActivateAbility={handleActivateAbility}
-            onPlaySpellTarget={handlePlaySpellTarget}
-          />
-          <div className="player-hand-row">
-            <div className="player-hand-row-spacer" aria-hidden="true" />
-            <HandView
-              cards={playerAHand}
-              playerName={playerA.name}
-              position="bottom"
-              playableCardIds={state.activePlayerId === 'playerA' ? playableCardIds : undefined}
-              directlyPlayableSpellIds={
-                state.activePlayerId === 'playerA'
-                  ? directlyPlayableSpellIds
-                  : undefined
-              }
-              discardableCardIds={discardableCardIds}
-              active={state.activePlayerId === 'playerA'}
-              disabled={
-                state.activePlayerId !== 'playerA' ||
-                state.phase !== 'main' ||
-                winnerId !== null
-              }
-              selectedCardId={state.activePlayerId === 'playerA' ? selectedCardId : null}
-              onCardClick={handleCardClick}
-              onDiscardCard={handleDiscardCard}
-              onPlaySpell={handlePlaySpell}
-            />
+          <motion.div
+            className="game-result-band"
+            data-result={winnerId === 'playerA' ? 'win' : 'loss'}
+            initial={{ opacity: 0, scale: 0.88 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.08, duration: 0.38, ease: 'easeOut' }}
+          >
+            <p className="game-result-message" role="status" aria-live="assertive">
+              {winnerMessage}
+            </p>
             <button
-              className="turn-end-button"
+              className="game-result-confirm"
               type="button"
-              aria-label="ターン終了"
-              disabled={
-                state.activePlayerId === AI_PLAYER_ID ||
-                state.phase === 'keepUp' ||
-                state.pendingCombat !== null ||
-                winnerId !== null
-              }
-              onClick={handlePassPhase}
-            >
-              ターン
-              <br />
-              終了
-            </button>
-          </div>
-          {winnerMessage !== null && (
-            <motion.div
-              className="game-result-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-            >
-              <motion.div
-                className="game-result-band"
-                data-result={winnerId === 'playerA' ? 'win' : 'loss'}
-                initial={{ opacity: 0, scale: 0.88 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.08, duration: 0.38, ease: 'easeOut' }}
-              >
-                <p className="game-result-message" role="status" aria-live="assertive">
-                  {winnerMessage}
-                </p>
-                <button
-                  className="game-result-confirm"
-                  type="button"
-                  autoFocus
-                  onClick={() => {
-                    if (winnerId !== null) {
-                      onResultConfirm(winnerId)
-                    }
-                  }}
-                >
-                  OK
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-          {scenarioRun !== null &&
-            (showScenarioIntro || winnerId === 'playerB' || showScenarioWinResult) && (
-              <ScenarioProgressDialog
-                opponentDeckIds={scenarioRun.opponentDeckIds}
-                currentBattleIndex={scenarioRun.currentBattleIndex}
-                rewardChoices={rewardChoices}
-                playerCardDefinitionIds={scenarioRun.playerCardDefinitionIds}
-                result={
-                  winnerId === null
-                    ? 'intro'
-                    : winnerId === 'playerA'
-                      ? 'win'
-                      : 'loss'
+              autoFocus
+              onClick={() => {
+                if (winnerId !== null) {
+                  onResultConfirm(winnerId)
                 }
-                onConfirm={(rewardId) => {
-                  if (winnerId === null) {
-                    setShowScenarioIntro(false)
-                  } else {
-                    if (rewardChoices.length > 0 &&
-                      (rewardId === undefined || !rewardChoices.includes(rewardId))) {
-                      return
-                    }
-                    onResultConfirm(winnerId, rewardId)
-                  }
-                }}
-              />
-            )}
-        </main>
-      </LayoutGroup>
-    </MotionConfig>
+              }}
+            >
+              OK
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+      {scenarioRun !== null &&
+        (showScenarioIntro || winnerId === 'playerB' || showScenarioWinResult) && (
+          <ScenarioProgressDialog
+            opponentDeckIds={scenarioRun.opponentDeckIds}
+            currentBattleIndex={scenarioRun.currentBattleIndex}
+            rewardChoices={rewardChoices}
+            playerCardDefinitionIds={scenarioRun.playerCardDefinitionIds}
+            result={
+              winnerId === null
+                ? 'intro'
+                : winnerId === 'playerA'
+                  ? 'win'
+                  : 'loss'
+            }
+            onConfirm={(rewardId) => {
+              if (winnerId === null) {
+                setShowScenarioIntro(false)
+              } else {
+                if (rewardChoices.length > 0 &&
+                  (rewardId === undefined || !rewardChoices.includes(rewardId))) {
+                  return
+                }
+                onResultConfirm(winnerId, rewardId)
+              }
+            }}
+          />
+        )}
+    </BattleScene>
   )
 }
 
