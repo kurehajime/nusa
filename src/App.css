@@ -1,3 +1,13 @@
+/* Slackey is reserved for cost and combat-stat numerals. */
+@font-face {
+  font-family: 'Slackey';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/slackey/files/slackey-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0030-0039;
+}
+
 @font-face {
   font-family: 'Yusei Magic';
   font-style: normal;
@@ -2323,6 +2333,13 @@
   fill: #fff;
   font-family: inherit;
   font-size: 27px;
+}
+
+.card-face-cost-text,
+.card-face-stat-value,
+.card-detail-popover .card-cost,
+.card-detail-popover .card-stats dd {
+  font-family: 'Slackey', 'Yusei Magic', 'Hiragino Kaku Gothic ProN', sans-serif;
 }
 
 .card-compact {
