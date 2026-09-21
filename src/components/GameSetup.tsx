@@ -26,11 +26,12 @@ export type GameSetupSelection =
   }
 
 type GameSetupProps = {
-  initialMode: BattleMode
+  mode: BattleMode
   initialPlayerDeckId: ThemeDeckId
   initialComDeckId: ThemeDeckId
   initialDifficulty: AiDifficulty
   onStart: (selection: GameSetupSelection) => void
+  onBack: (selection: GameSetupSelection) => void
 }
 
 const AI_DIFFICULTIES: readonly {
@@ -161,55 +162,31 @@ const ScenarioDeckSelector = ({
 }
 
 const GameSetup = ({
-  initialMode,
+  mode,
   initialPlayerDeckId,
   initialComDeckId,
   initialDifficulty,
   onStart,
+  onBack,
 }: GameSetupProps) => {
-  const [mode, setMode] = useState<BattleMode>(initialMode)
   const [playerDeckId, setPlayerDeckId] = useState<ThemeDeckId>(initialPlayerDeckId)
   const [comDeckId, setComDeckId] = useState<ThemeDeckId>(initialComDeckId)
   const [difficulty, setDifficulty] = useState<AiDifficulty>(initialDifficulty)
+  const selection: GameSetupSelection = mode === 'scenario'
+    ? { mode, playerDeckId, difficulty }
+    : { mode, playerDeckId, comDeckId, difficulty }
 
   return (
     <main
-      className="setup-shell"
+      className="setup-shell setup-screen"
       style={getDeckBackgroundStyle(playerDeckId)}
     >
-      <header className="setup-header">
-        <h1>nusa</h1>
-        <span>対戦設定</span>
-      </header>
-      <section className="setup-panel" aria-label="デッキ選択">
-        <div className="setup-mode-tabs" role="tablist" aria-label="対戦モード">
-          <button
-            id="scenario-battle-tab"
-            type="button"
-            role="tab"
-            aria-selected={mode === 'scenario'}
-            aria-controls="battle-setup-panel"
-            onClick={() => setMode('scenario')}
-          >
-            シナリオバトル
-          </button>
-          <button
-            id="free-battle-tab"
-            type="button"
-            role="tab"
-            aria-selected={mode === 'free'}
-            aria-controls="battle-setup-panel"
-            onClick={() => setMode('free')}
-          >
-            フリーバトル
-          </button>
-        </div>
-        <div
-          id="battle-setup-panel"
-          className="setup-mode-panel"
-          role="tabpanel"
-          aria-labelledby={mode === 'scenario' ? 'scenario-battle-tab' : 'free-battle-tab'}
-        >
+      <section className="setup-panel" aria-labelledby="game-setup-title">
+        <header className="setup-header">
+          <h1 id="game-setup-title">ゲーム準備</h1>
+          <span>{mode === 'scenario' ? 'シナリオ' : 'フリーバトル'}</span>
+        </header>
+        <div className="setup-mode-panel">
           {mode === 'scenario' ? (
             <ScenarioDeckSelector value={playerDeckId} onChange={setPlayerDeckId} />
           ) : (
@@ -240,19 +217,14 @@ const GameSetup = ({
             ))}
           </div>
         </fieldset>
-        <button
-          className="setup-start-button"
-          type="button"
-          onClick={() =>
-            onStart(
-              mode === 'scenario'
-                ? { mode, playerDeckId, difficulty }
-                : { mode, playerDeckId, comDeckId, difficulty },
-            )
-          }
-        >
-          {mode === 'scenario' ? 'シナリオ開始' : 'ゲーム開始'}
-        </button>
+        <div className="setup-actions">
+          <button className="setup-back-button" type="button" onClick={() => onBack(selection)}>
+            タイトルへ戻る
+          </button>
+          <button className="setup-start-button" type="button" onClick={() => onStart(selection)}>
+            {mode === 'scenario' ? 'シナリオ開始' : 'ゲーム開始'}
+          </button>
+        </div>
       </section>
     </main>
   )

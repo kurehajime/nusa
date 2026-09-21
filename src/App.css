@@ -53,7 +53,6 @@
   pointer-events: none;
 }
 
-.setup-header,
 .setup-panel {
   width: min(920px, 100%);
   margin-inline: auto;
@@ -61,10 +60,10 @@
 
 .setup-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
 }
 
 .setup-header h1 {
@@ -90,34 +89,86 @@
   border-radius: 8px;
   background: #fbfcf8;
   color: #171a17;
+  box-shadow: 0 8px 24px rgb(36 23 16 / 16%);
 }
 
-.setup-mode-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-bottom: 1px solid #aeb8aa;
+.title-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
 }
 
-.setup-mode-tabs button {
-  min-height: 46px;
-  padding: 0 16px;
-  border: 0;
-  border-bottom: 4px solid transparent;
-  background: transparent;
-  color: #667066;
-  font-size: 18px;
-  font-weight: 800;
+.title-logo {
+  margin: 0;
+  font-size: clamp(64px, 12vw, 112px);
+  font-weight: 400;
+  line-height: 1.1;
+  text-shadow: 0 2px 0 rgb(255 255 255 / 65%);
+}
+
+.title-mode-panel {
+  width: min(420px, 100%);
+  padding: 28px;
+  gap: 20px;
+}
+
+.title-mode-panel h2 {
+  margin: 0 0 4px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.title-mode-button {
+  min-height: 64px;
+  padding: 12px 20px;
+  border: 1px solid #2d3f38;
+  border-radius: 8px;
+  background: #26342f;
+  box-shadow: 0 3px 0 rgb(18 22 19 / 25%), 0 6px 10px rgb(18 22 19 / 24%);
+  color: #f8fbf5;
+  font-size: 24px;
   cursor: pointer;
 }
 
-.setup-mode-tabs button[aria-selected='true'] {
-  border-bottom-color: #26342f;
-  color: #171a17;
+.title-mode-button:hover,
+.setup-start-button:hover {
+  background: #18231f;
 }
 
-.setup-mode-tabs button:focus-visible {
+.title-mode-button:focus-visible,
+.setup-back-button:focus-visible {
   outline: 3px solid #276fbf;
-  outline-offset: -3px;
+  outline-offset: 3px;
+}
+
+.setup-screen {
+  display: grid;
+  align-items: center;
+}
+
+.setup-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.setup-back-button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #9aa596;
+  border-radius: 6px;
+  background: #f2f5ee;
+  color: #465047;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.setup-back-button:hover {
+  background: #e3e9de;
 }
 
 .setup-mode-panel {
@@ -1051,11 +1102,6 @@
 }
 
 @media (max-width: 720px) {
-  .setup-mode-tabs button {
-    padding-inline: 6px;
-    font-size: 16px;
-  }
-
   .scenario-result-dialog {
     max-height: calc(100dvh - 24px);
   }
@@ -2824,10 +2870,17 @@
 
   .setup-panel {
     padding: 14px;
+    gap: 16px;
   }
 
   .setup-start-button {
     width: 100%;
+  }
+
+  .setup-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
   }
 
   .game-shell {

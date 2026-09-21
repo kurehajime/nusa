@@ -25,6 +25,7 @@ import GameSetup, {
 } from './GameSetup'
 import HandView from './HandView'
 import ScenarioProgressDialog from './ScenarioProgressDialog'
+import TitleScreen from './TitleScreen'
 import { getDeckBackgroundStyle } from './deckBackground'
 
 const COMBAT_EFFECT_DURATION_MS = 500
@@ -546,11 +547,21 @@ const GameApp = () => {
     difficulty: 'easy',
   })
   const [scenarioRun, setScenarioRun] = useState<ScenarioRun | null>(null)
-  const [gameStarted, setGameStarted] = useState(false)
+  const [screen, setScreen] = useState<'title' | 'setup' | 'game'>('title')
 
   const returnToSetup = () => {
     setScenarioRun(null)
-    setGameStarted(false)
+    setScreen('setup')
+  }
+
+  const returnToTitle = (nextSelection: GameSetupSelection) => {
+    setSelection((current) => ({
+      ...current,
+      playerDeckId: nextSelection.playerDeckId,
+      difficulty: nextSelection.difficulty,
+      ...(nextSelection.mode === 'free' ? { comDeckId: nextSelection.comDeckId } : {}),
+    }))
+    setScreen('title')
   }
 
   const startGame = (nextSelection: GameSetupSelection) => {
@@ -579,7 +590,7 @@ const GameApp = () => {
       })
       setScenarioRun(null)
     }
-    setGameStarted(true)
+    setScreen('game')
   }
 
   const handleResultConfirm = (winnerId: PlayerId, rewardId?: CardDefinitionId) => {
@@ -609,14 +620,27 @@ const GameApp = () => {
     })
   }
 
-  if (!gameStarted) {
+  if (screen === 'title') {
+    return (
+      <TitleScreen
+        playerDeckId={selection.playerDeckId}
+        onSelectMode={(mode) => {
+          setSetupMode(mode)
+          setScreen('setup')
+        }}
+      />
+    )
+  }
+
+  if (screen === 'setup') {
     return (
       <GameSetup
-        initialMode={setupMode}
+        mode={setupMode}
         initialPlayerDeckId={selection.playerDeckId}
         initialComDeckId={selection.comDeckId}
         initialDifficulty={selection.difficulty}
         onStart={startGame}
+        onBack={returnToTitle}
       />
     )
   }
