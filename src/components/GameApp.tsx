@@ -30,7 +30,7 @@ import TitleDemo from './TitleDemo'
 
 const COMBAT_EFFECT_DURATION_MS = 500
 const AI_ACTION_DELAY_MS = 700
-const SCENARIO_WIN_DIALOG_DELAY_MS = 500
+const RESULT_DIALOG_DELAY_MS = 800
 const AI_PLAYER_ID = 'playerB'
 
 type GameUiState = {
@@ -116,7 +116,7 @@ const GameSession = ({
   const [showScenarioIntro, setShowScenarioIntro] = useState(
     scenarioRun?.currentBattleIndex === 0,
   )
-  const [showScenarioWinResult, setShowScenarioWinResult] = useState(false)
+  const [showResult, setShowResult] = useState(false)
   const [rewardChoices, setRewardChoices] = useState<CardDefinitionId[]>([])
   const [{ manager, selectedCardId, message }, dispatch] = useReducer(
     gameUiReducer,
@@ -145,16 +145,20 @@ const GameSession = ({
   }, [state.pendingCombat])
 
   useEffect(() => {
-    if (scenarioRun === null || winnerId !== 'playerA') {
+    if (winnerId === null) {
       return
     }
 
     const timeoutId = window.setTimeout(() => {
-      if (scenarioRun.currentBattleIndex < scenarioRun.opponentDeckIds.length - 1) {
+      if (
+        scenarioRun !== null &&
+        winnerId === 'playerA' &&
+        scenarioRun.currentBattleIndex < scenarioRun.opponentDeckIds.length - 1
+      ) {
         setRewardChoices(getScenarioRewardChoices(scenarioRun.playerCardDefinitionIds))
       }
-      setShowScenarioWinResult(true)
-    }, SCENARIO_WIN_DIALOG_DELAY_MS)
+      setShowResult(true)
+    }, RESULT_DIALOG_DELAY_MS)
 
     return () => window.clearTimeout(timeoutId)
   }, [scenarioRun, winnerId])
@@ -321,7 +325,7 @@ const GameSession = ({
       onPlaySpell={handlePlaySpell}
       onPassPhase={handlePassPhase}
     >
-      {winnerMessage !== null && (
+      {showResult && winnerMessage !== null && (
         <motion.div
           className="game-result-overlay"
           initial={{ opacity: 0 }}
@@ -354,7 +358,7 @@ const GameSession = ({
         </motion.div>
       )}
       {scenarioRun !== null &&
-        (showScenarioIntro || winnerId === 'playerB' || showScenarioWinResult) && (
+        ((showScenarioIntro && winnerId === null) || showResult) && (
           <ScenarioProgressDialog
             opponentDeckIds={scenarioRun.opponentDeckIds}
             currentBattleIndex={scenarioRun.currentBattleIndex}
