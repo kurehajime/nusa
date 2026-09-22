@@ -90,10 +90,10 @@ const ScenarioProgressDialog = ({
           <h2 id="scenario-result-title" aria-label={animateResultTitle ? title : undefined}>
             {animateResultTitle
               ? [...title].map((letter) => (
-                  <span key={letter} className="scenario-result-letter" aria-hidden="true">
-                    {letter}
-                  </span>
-                ))
+                <span key={letter} className="scenario-result-letter" aria-hidden="true">
+                  {letter}
+                </span>
+              ))
               : title}
           </h2>
           <span id="scenario-result-description">{description}</span>
@@ -111,7 +111,7 @@ const ScenarioProgressDialog = ({
             const stateLabel = defeated
               ? '撃破済み'
               : next
-                ? '次の対戦相手'
+                ? 'NEXT'
                 : failed
                   ? '敗北した相手'
                   : '未対戦'
@@ -129,7 +129,7 @@ const ScenarioProgressDialog = ({
                 aria-label={`${index + 1}戦目 ${deck.name} ${stateLabel}`}
               >
                 <span className="scenario-opponent-state" aria-hidden="true">
-                  {next ? '次の対戦' : failed ? 'COMの勝利' : '\u00a0'}
+                  {next ? 'NEXT' : failed ? 'COMの勝利' : '\u00a0'}
                 </span>
                 <span
                   className="scenario-opponent-icon"
@@ -196,7 +196,7 @@ const ScenarioProgressDialog = ({
             ? '対戦開始'
             : nextBattleIndex === null
               ? 'OK'
-              : '次の対戦へ'}
+              : 'NEXTへ'}
         </button>
       </motion.section>
     </motion.div>
