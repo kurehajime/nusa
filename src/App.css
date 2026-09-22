@@ -820,7 +820,7 @@
   grid-auto-flow: column;
   grid-auto-columns: minmax(126px, 1fr);
   gap: 12px;
-  /* Keep the glow inside the horizontal scroller without increasing its height. */
+  /* Leave room for the raised portrait inside the horizontal scroller. */
   margin: -12px -12px -12px;
   padding: 12px 28px 24px;
   overflow-x: auto;
@@ -965,22 +965,30 @@
   color: #fff;
 }
 
+@property --scenario-border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .scenario-opponent:is(.scenario-opponent-next, .scenario-opponent-failed)
   .scenario-opponent-icon {
   border-color: transparent;
-  box-shadow:
-    0 0 10px 2px rgb(255 255 255 / 65%),
-    0 0 24px 5px rgb(255 255 255 / 32%),
-    0 8px 18px rgb(10 4 2 / 35%);
-  animation: scenario-opponent-halo 2.8s ease-in-out infinite;
+  box-shadow: none;
+  background: conic-gradient(
+    from var(--scenario-border-angle),
+    var(--scenario-main-color),
+    color-mix(in srgb, var(--scenario-main-color), white 40%) 25%,
+    var(--scenario-sub-color) 50%,
+    color-mix(in srgb, var(--scenario-sub-color), white 20%) 75%,
+    var(--scenario-main-color)
+  ) border-box;
+  animation: scenario-opponent-border-flow 4s linear infinite;
 }
 
-@keyframes scenario-opponent-halo {
-  50% {
-    box-shadow:
-      0 0 14px 4px rgb(255 255 255 / 95%),
-      0 0 34px 10px rgb(255 255 255 / 60%),
-      0 8px 18px rgb(10 4 2 / 35%);
+@keyframes scenario-opponent-border-flow {
+  to {
+    --scenario-border-angle: 360deg;
   }
 }
 
