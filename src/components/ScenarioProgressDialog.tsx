@@ -196,7 +196,7 @@ const ScenarioProgressDialog = ({
             ? '対戦開始'
             : nextBattleIndex === null
               ? 'OK'
-              : 'NEXTへ'}
+              : '次の対戦へ'}
         </button>
       </motion.section>
     </motion.div>
