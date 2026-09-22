@@ -183,7 +183,7 @@ const GameSetup = ({
     >
       <section className="setup-panel" aria-labelledby="game-setup-title">
         <header className="setup-header">
-          <h1 id="game-setup-title">ゲーム準備</h1>
+          <h1 id="game-setup-title">デッキ選択</h1>
           <span>{mode === 'scenario' ? 'シナリオ' : 'フリーバトル'}</span>
         </header>
         <div className="setup-mode-panel">
