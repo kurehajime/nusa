@@ -124,10 +124,23 @@
   pointer-events: none;
 }
 
-.title-logo,
+.title-brand,
 .title-mode-panel {
   position: relative;
   z-index: 1;
+}
+
+.title-brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 3vw, 24px);
+  max-width: 100%;
+}
+
+.title-card-back {
+  --card-surface-shadow: 0 2px 1px rgb(18 22 19 / 45%);
+  flex: none;
+  width: clamp(64px, 9vw, 92px);
 }
 
 .title-logo {
