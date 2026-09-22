@@ -23,6 +23,7 @@
 .setup-shell,
 .game-shell {
   --action-button-border: #f8fbf5;
+  --action-button-shadow: 0 3px 0 rgb(18 22 19 / 25%), 0 6px 10px rgb(18 22 19 / 36%);
   --table-surface-tint: rgb(255 254 248 / 52%);
 }
 
@@ -48,6 +49,7 @@
   z-index: -1;
   background-color: var(--table-background-color, #b9e6f2);
   background-image:
+    url('./assets/table-crayon-noise.svg'),
     linear-gradient(var(--table-surface-tint, rgb(255 255 255 / 10%)), var(--table-surface-tint, rgb(255 255 255 / 10%))),
     var(--table-background-image, none);
   filter: saturate(110%);
@@ -152,10 +154,10 @@
 .title-mode-button {
   min-height: 64px;
   padding: 12px 20px;
-  border: 1px solid #2d3f38;
+  border: 2px solid var(--action-button-border);
   border-radius: 8px;
   background: #26342f;
-  box-shadow: 0 3px 0 rgb(18 22 19 / 25%), 0 6px 10px rgb(18 22 19 / 24%);
+  box-shadow: var(--action-button-shadow);
   color: #f8fbf5;
   font-size: 24px;
   cursor: pointer;
@@ -187,9 +189,10 @@
 .setup-back-button {
   min-height: 44px;
   padding: 8px 12px;
-  border: 1px solid #9aa596;
+  border: 2px solid var(--action-button-border);
   border-radius: 6px;
   background: #f2f5ee;
+  box-shadow: var(--action-button-shadow);
   color: #465047;
   font-size: 16px;
   cursor: pointer;
@@ -504,9 +507,10 @@
   min-height: 44px;
   justify-self: end;
   padding: 0 24px;
-  border: 1px solid #2d3f38;
+  border: 2px solid var(--action-button-border);
   border-radius: 8px;
   background: #26342f;
+  box-shadow: var(--action-button-shadow);
   color: #f8fbf5;
   font-size: 22px;
   font-weight: 800;
@@ -519,7 +523,6 @@
 }
 
 .game-shell {
-  --action-button-shadow: 0 3px 0 rgb(18 22 19 / 25%), 0 6px 10px rgb(18 22 19 / 36%);
   --action-button-filter: drop-shadow(0 3px 2px rgb(18 22 19 / 38%)) drop-shadow(0 5px 5px rgb(18 22 19 / 28%));
 
   position: relative;
@@ -536,18 +539,6 @@
     calc(18px + env(safe-area-inset-left, 0px));
   background: transparent;
   color: #243e43;
-}
-
-.game-shell::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  background-image: var(--surface-noise);
-  background-size: 80px 80px;
-  mix-blend-mode: soft-light;
-  opacity: 0.12;
-  pointer-events: none;
 }
 
 .game-shell>* {
@@ -677,10 +668,10 @@
   min-height: 60px;
   margin-right: 20px;
   padding: 10px 26px;
-  border: 2px solid #26342f;
+  border: 2px solid var(--action-button-border);
   border-radius: 6px;
   background: #26342f;
-  box-shadow: 0 4px 12px rgb(20 10 6 / 25%);
+  box-shadow: var(--action-button-shadow);
   color: #fff;
   font-size: 24px;
   font-weight: 900;
@@ -998,10 +989,10 @@
   min-width: 190px;
   min-height: 54px;
   padding: 10px 24px;
-  border: 2px solid #26342f;
+  border: 2px solid var(--action-button-border);
   border-radius: 6px;
   background: #26342f;
-  box-shadow: 0 4px 12px rgb(20 10 6 / 25%);
+  box-shadow: var(--action-button-shadow);
   color: #fff;
   font-size: 22px;
   font-weight: 900;
@@ -1020,6 +1011,8 @@
 }
 
 .scenario-result-confirm:disabled {
+  border-color: rgb(217 223 212 / 40%);
+  box-shadow: none;
   opacity: 0.45;
   cursor: default;
   transform: none;
@@ -1059,6 +1052,7 @@
 }
 
 .scenario-reward-choice .card-view {
+  --card-surface-shadow: 0 2px 1px rgb(18 22 19 / 45%);
   width: 100%;
   min-width: 0;
 }
@@ -2913,8 +2907,12 @@
     gap: 12px;
   }
 
+  .setup-shell,
   .game-shell {
     --action-button-shadow: 0 2px 0 rgb(18 22 19 / 25%), 0 4px 6px rgb(18 22 19 / 36%);
+  }
+
+  .game-shell {
     --action-button-filter: drop-shadow(0 2px 1px rgb(18 22 19 / 38%)) drop-shadow(0 3px 3px rgb(18 22 19 / 28%));
 
     padding:
