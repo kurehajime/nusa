@@ -1992,6 +1992,7 @@
 }
 
 .hand-card-button>.card-view {
+  --card-surface-shadow: 0 2px 1px rgb(18 22 19 / 45%);
   width: 100%;
   height: 100%;
 }
@@ -2533,6 +2534,7 @@
   border: 3px solid #24170f;
   background: #432d22;
   box-shadow:
+    var(--card-surface-shadow, 0 0 0 transparent),
     inset 0 0 0 5px #fff,
     inset 0 0 0 8px #24170f;
   overflow: hidden;
