@@ -185,6 +185,7 @@ const BattleScene = ({
               cards={playerAHand}
               playerName={playerA.name}
               position="bottom"
+              deckCardIds={playerA.deck}
               playableCardIds={state.activePlayerId === 'playerA' ? playableCardIds : undefined}
               directlyPlayableSpellIds={
                 state.activePlayerId === 'playerA'
