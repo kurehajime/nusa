@@ -230,6 +230,16 @@ const BoardPlayer = ({
         }
         transition={{ duration: shakeDuration, ease: 'easeInOut' }}
       >
+        {/* Invisible shared-layout origins for up to one full hand refill. */}
+        {player.id === 'playerA' && player.deck.slice(0, 5).map((cardId) => (
+          <motion.div
+            key={cardId}
+            className="board-draw-origin"
+            layout="position"
+            layoutId={`card-${cardId}`}
+            aria-hidden="true"
+          />
+        ))}
         <img
           className={`board-player-icon board-player-icon-${player.id}`}
           src={imageUrl}

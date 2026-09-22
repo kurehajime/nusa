@@ -8,7 +8,6 @@ type HandViewProps = {
   faceDown?: boolean
   playerName: string
   position: 'top' | 'bottom'
-  deckCardIds?: readonly CardInstanceId[]
   playableCardIds?: ReadonlySet<CardInstanceId>
   directlyPlayableSpellIds?: ReadonlySet<CardInstanceId>
   discardableCardIds?: ReadonlySet<CardInstanceId>
@@ -28,7 +27,6 @@ const HandView = ({
   faceDown = false,
   playerName,
   position,
-  deckCardIds,
   playableCardIds,
   directlyPlayableSpellIds,
   discardableCardIds,
@@ -108,32 +106,6 @@ const HandView = ({
           directlyPlayableSpellIds?.has(card.id) === true
         return (
           <div className="hand-card-slot" key={card?.id ?? `empty-${index}`}>
-            {index === 0 && deckCardIds !== undefined && (
-              <div
-                className="hand-draw-pile"
-                role="img"
-                aria-label={`${playerName}の山札：残り${deckCardIds.length}枚`}
-              >
-                <div className="hand-draw-pile-cards" aria-hidden="true">
-                  {/* Keep a shared-layout source for every card in the next hand refill. */}
-                  {deckCardIds.slice(0, EMPTY_HAND_SLOTS).toReversed().map((cardId) => (
-                    <div className="hand-draw-pile-layer" key={cardId}>
-                      <motion.div
-                        className="hand-draw-pile-card"
-                        layout="position"
-                        layoutId={`card-${cardId}`}
-                      >
-                        <CardView card={null} faceDown compact />
-                      </motion.div>
-                    </div>
-                  ))}
-                  {deckCardIds.length === 0 && <CardView card={null} compact />}
-                </div>
-                <div className="hand-draw-pile-label" aria-hidden="true">
-                  山札 <span>{deckCardIds.length}</span>
-                </div>
-              </div>
-            )}
             <div className="hand-card-main">
               {cardButton}
               {canPlaySelectedSpell && (
