@@ -22,6 +22,7 @@
 
 .setup-shell,
 .game-shell {
+  --action-button-border: #f8fbf5;
   --table-surface-tint: rgb(255 254 248 / 52%);
 }
 
@@ -1489,7 +1490,8 @@
 
 .board-ability-actions button:not(:disabled) {
   cursor: pointer;
-  box-shadow: var(--action-button-shadow);
+  border-color: var(--action-button-border);
+  box-shadow: inset 0 0 0 1px var(--action-button-border), var(--action-button-shadow);
 }
 
 .board-ability-actions button:disabled {
@@ -1668,7 +1670,8 @@
 }
 
 .board-insert-slot:not(:disabled) {
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 18%), var(--action-button-shadow);
+  border-color: var(--action-button-border);
+  box-shadow: var(--action-button-shadow);
 }
 
 .board-group-button {
@@ -1752,6 +1755,23 @@
 .board-ability-actions .board-spell-target-button:not(:disabled) {
   filter: var(--action-button-filter);
   box-shadow: none;
+}
+
+/* Use two matching silhouettes to outline arrows and target buttons. */
+.board-group-button:not(:disabled)::after,
+.board-ability-actions .board-spell-target-button:not(:disabled)::after {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background: var(--action-button-border);
+  clip-path: var(--button-shape);
+  pointer-events: none;
+}
+
+.board-group-button:not(:disabled)::before,
+.board-ability-actions .board-spell-target-button:not(:disabled)::before {
+  inset: 2px;
 }
 
 .board-group-button:focus-visible {
@@ -1857,6 +1877,7 @@
 
 .turn-end-button:not(:disabled) {
   cursor: pointer;
+  border-color: var(--action-button-border);
 }
 
 .turn-end-button:not(:disabled):hover {
@@ -1944,6 +1965,7 @@
 
 .hand-discard-button:not(:disabled) {
   cursor: pointer;
+  box-shadow: inset 0 0 0 2px var(--action-button-border), var(--action-button-shadow);
 }
 
 .hand-discard-button:not(:disabled):hover {
