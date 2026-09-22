@@ -646,8 +646,8 @@
   grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr);
   align-items: center;
   padding: 30px 24px 34px;
-  border-block: 1px solid rgb(255 250 241 / 28%);
-  background: rgb(24 16 12 / 38%);
+  border-block: 1px solid rgb(255 255 255 / 85%);
+  background: rgb(255 254 250 / 65%);
   box-shadow: 0 12px 36px rgb(20 10 6 / 38%);
   backdrop-filter: blur(4px) saturate(0.72);
   pointer-events: auto;
@@ -656,25 +656,17 @@
 .game-result-message {
   grid-column: 2;
   margin: 0;
-  color: #fff;
+  color: #26342f;
   font-family: var(--font-text);
   font-size: 96px;
   font-weight: 400;
   line-height: 1.15;
   text-align: center;
-  text-shadow:
-    0 2px 2px rgb(20 10 6 / 95%),
-    0 0 8px rgb(20 10 6 / 85%),
-    0 10px 28px rgb(20 10 6 / 72%);
-}
-
-.game-result-band[data-result='loss'] {
-  background: rgb(58 24 27 / 38%);
-  border-color: rgb(255 218 214 / 38%);
+  text-shadow: 0 2px 0 rgb(255 255 255 / 85%), 0 4px 12px rgb(36 52 47 / 16%);
 }
 
 .game-result-band[data-result='loss'] .game-result-message {
-  color: #ffe3e0;
+  color: #d82020;
 }
 
 .game-result-confirm {
@@ -684,24 +676,24 @@
   min-height: 60px;
   margin-right: 20px;
   padding: 10px 26px;
-  border: 2px solid #fffaf1;
+  border: 2px solid #26342f;
   border-radius: 6px;
-  background: #f4eee5;
-  box-shadow: 0 8px 20px rgb(20 10 6 / 46%);
-  color: #26342f;
+  background: #26342f;
+  box-shadow: 0 4px 12px rgb(20 10 6 / 25%);
+  color: #fff;
   font-size: 24px;
   font-weight: 900;
   transition: background-color 120ms ease, transform 120ms ease;
 }
 
 .game-result-confirm:hover {
-  background: #fffaf1;
+  background: #18231f;
   cursor: pointer;
   transform: translateY(-2px);
 }
 
 .game-result-confirm:focus-visible {
-  outline: 3px solid #fffaf1;
+  outline: 3px solid #276fbf;
   outline-offset: 4px;
 }
 
@@ -718,31 +710,17 @@
   display: grid;
   gap: 22px;
   padding: 24px 28px 28px;
-  border: 1px solid rgb(255 250 241 / 38%);
+  border: 1px solid rgb(255 255 255 / 85%);
   border-radius: 8px;
-  background: rgb(31 23 19 / 52%);
+  background: rgb(255 254 250 / 65%);
   box-shadow: 0 18px 56px rgb(20 10 6 / 58%);
-  color: #fff;
+  color: #26342f;
   backdrop-filter: blur(5px) saturate(0.75);
   pointer-events: auto;
 }
 
-.scenario-result-dialog[data-result='loss'] {
-  background: rgb(58 24 27 / 52%);
-  border-color: rgb(255 218 214 / 44%);
-  box-shadow: 0 18px 56px rgb(42 10 15 / 58%);
-}
-
-.scenario-result-dialog[data-result='loss'] :is(
-  .scenario-result-header > span,
-  .scenario-opponent-order,
-  .scenario-opponent strong
-) {
-  color: #ffe3e0;
-}
-
 .scenario-result-dialog[data-result='loss'] .scenario-result-header h2 {
-  color: #ff2020;
+  color: #d82020;
 }
 
 .scenario-result-header {
@@ -758,9 +736,7 @@
 .scenario-rewards h3,
 .scenario-reward-choice > strong,
 .scenario-reward-choice > span {
-  text-shadow:
-    0 1px 2px rgb(10 4 2 / 95%),
-    0 2px 6px rgb(10 4 2 / 85%);
+  text-shadow: 0 1px 1px rgb(255 255 255 / 85%);
 }
 
 .scenario-result-header p,
@@ -770,7 +746,7 @@
 }
 
 .scenario-result-header p {
-  color: #fff;
+  color: #26342f;
   font-size: 12px;
   font-weight: 900;
 }
@@ -780,10 +756,7 @@
   font-size: 42px;
   font-weight: 400;
   line-height: 1.1;
-  text-shadow:
-    0 2px 2px rgb(10 4 2 / 95%),
-    0 0 8px rgb(10 4 2 / 85%),
-    0 5px 18px rgb(10 4 2 / 80%);
+  text-shadow: 0 2px 0 rgb(255 255 255 / 85%), 0 4px 12px rgb(36 52 47 / 16%);
 }
 
 .scenario-result-dialog:is([data-result='win'], [data-result='loss'], [data-result='complete'])
@@ -792,7 +765,7 @@
 }
 
 .scenario-result-header > span {
-  color: #fff;
+  color: #26342f;
   font-size: 14px;
   font-weight: 700;
 }
@@ -861,7 +834,7 @@
   justify-items: center;
   align-content: start;
   gap: 6px;
-  color: #fff;
+  color: #26342f;
   opacity: 0.35;
 }
 
@@ -878,7 +851,7 @@
   left: calc(50% + 49px);
   width: calc(100% - 86px);
   height: 2px;
-  background: rgb(255 250 241 / 26%);
+  background: rgb(38 52 47 / 26%);
 }
 
 .scenario-opponent-state {
@@ -887,7 +860,7 @@
   place-items: center;
   padding: 2px 8px;
   border-radius: 4px;
-  color: #fff;
+  color: #26342f;
   font-size: 11px;
   font-weight: 900;
   line-height: 1.4;
@@ -935,7 +908,7 @@
 }
 
 .scenario-opponent-order {
-  color: #fff;
+  color: #26342f;
   font-size: 10px;
   font-weight: 900;
 }
@@ -945,7 +918,7 @@
   min-height: 38px;
   display: grid;
   align-items: start;
-  color: #fff;
+  color: #26342f;
   font-size: 14px;
   line-height: 1.35;
   text-align: center;
@@ -957,13 +930,13 @@
 }
 
 .scenario-opponent-next {
-  color: #fff;
+  color: #26342f;
   opacity: 1;
 }
 
 .scenario-opponent-next .scenario-opponent-state {
-  background: #f4eee5;
-  color: #26342f;
+  background: #26342f;
+  color: #fff;
 }
 
 .scenario-opponent-next .scenario-opponent-icon,
@@ -976,7 +949,7 @@
 
 .scenario-opponent-next .scenario-opponent-order,
 .scenario-opponent-next strong {
-  color: #fff;
+  color: #26342f;
 }
 
 .scenario-opponent-next strong {
@@ -1016,24 +989,24 @@
   min-width: 190px;
   min-height: 54px;
   padding: 10px 24px;
-  border: 2px solid #fffaf1;
+  border: 2px solid #26342f;
   border-radius: 6px;
-  background: #f4eee5;
-  box-shadow: 0 8px 20px rgb(20 10 6 / 46%);
-  color: #26342f;
+  background: #26342f;
+  box-shadow: 0 4px 12px rgb(20 10 6 / 25%);
+  color: #fff;
   font-size: 22px;
   font-weight: 900;
   transition: background-color 120ms ease, transform 120ms ease;
 }
 
 .scenario-result-confirm:hover {
-  background: #fffaf1;
+  background: #18231f;
   cursor: pointer;
   transform: translateY(-2px);
 }
 
 .scenario-result-confirm:focus-visible {
-  outline: 3px solid #fffaf1;
+  outline: 3px solid #276fbf;
   outline-offset: 4px;
 }
 
@@ -1050,7 +1023,7 @@
 
 .scenario-rewards h3 {
   margin: 0 0 12px;
-  color: #fff;
+  color: #26342f;
   font-size: 18px;
 }
 
@@ -1072,7 +1045,7 @@
   border: 2px solid transparent;
   border-radius: 6px;
   background: transparent;
-  color: #fff;
+  color: #26342f;
   cursor: pointer;
 }
 
@@ -1091,12 +1064,12 @@
 }
 
 .scenario-reward-choice[aria-pressed='true'] {
-  border-color: #fff;
-  background: rgb(255 255 255 / 15%);
+  border-color: #26342f;
+  background: rgb(38 52 47 / 8%);
 }
 
 .scenario-reward-choice:focus-visible {
-  outline: 3px solid #fff;
+  outline: 3px solid #276fbf;
   outline-offset: 3px;
 }
 
