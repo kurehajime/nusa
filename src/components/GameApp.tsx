@@ -27,6 +27,13 @@ import GameSetup, {
 import ScenarioProgressDialog from './ScenarioProgressDialog'
 import TitleScreen from './TitleScreen'
 import TitleDemo from './TitleDemo'
+import TutorialGuide from './TutorialGuide'
+import { TUTORIAL } from '../game/tutorial/script'
+import {
+  applyTutorialInput, createTutorial, endCurrentTurn, finishTutorialCombat,
+  getTutorialInstruction, isTutorialActive, tutorialInputsEqual,
+  type TutorialInput, type TutorialProgress,
+} from '../game/tutorial/controller'
 
 const COMBAT_EFFECT_DURATION_MS = 500
 const AI_ACTION_DELAY_MS = 700
@@ -37,9 +44,12 @@ type GameUiState = {
   manager: GameManager
   selectedCardId: CardInstanceId | null
   message: string | null
+  tutorial: TutorialProgress | null
 }
 
 type GameUiAction =
+  | { type: 'tutorialInput'; input: TutorialInput; stepIndex: number }
+  | { type: 'finishCombat' }
   | { type: 'selectCard'; cardId: CardInstanceId }
   | { type: 'applyGameUpdate'; update: (manager: GameManager) => GameManager }
 
@@ -57,6 +67,7 @@ type ScenarioRun = {
 
 type GameSessionProps = GameSelection & {
   scenarioRun: ScenarioRun | null
+  tutorialMode: boolean
   onResultConfirm: (winnerId: PlayerId, rewardId?: CardDefinitionId) => void
 }
 
@@ -65,18 +76,44 @@ const createGameUiState = ({
   comDeckId,
   difficulty,
   scenarioRun,
-}: GameSelection & { scenarioRun: ScenarioRun | null }): GameUiState => ({
-  manager: GameManager.create(Math.random, {
-    playerA: scenarioRun?.playerCardDefinitionIds ?? THEME_DECK_BY_ID[playerDeckId].cardDefinitionIds,
-    playerB: scenarioRun
-      ? getScenarioComDeck(comDeckId, difficulty, scenarioRun.currentBattleIndex)
-      : THEME_DECK_BY_ID[comDeckId].cardDefinitionIds,
-  }),
-  selectedCardId: null,
-  message: null,
-})
+  tutorialMode,
+}: GameSelection & { scenarioRun: ScenarioRun | null; tutorialMode: boolean }): GameUiState => {
+  if (tutorialMode) {
+    const { manager, progress } = createTutorial()
+    return { manager, tutorial: progress, selectedCardId: null, message: null }
+  }
+  return {
+    manager: GameManager.create(Math.random, {
+      playerA: scenarioRun?.playerCardDefinitionIds ?? THEME_DECK_BY_ID[playerDeckId].cardDefinitionIds,
+      playerB: scenarioRun
+        ? getScenarioComDeck(comDeckId, difficulty, scenarioRun.currentBattleIndex)
+        : THEME_DECK_BY_ID[comDeckId].cardDefinitionIds,
+    }),
+    selectedCardId: null,
+    message: null,
+    tutorial: null,
+  }
+}
 
 const gameUiReducer = (state: GameUiState, action: GameUiAction): GameUiState => {
+  if (action.type === 'tutorialInput' || action.type === 'finishCombat') {
+    try {
+      if (action.type === 'finishCombat') {
+        if (!state.manager.state.pendingCombat) return state
+        if (state.tutorial) {
+          const next = finishTutorialCombat(state.manager, state.tutorial)
+          return { ...state, manager: next.manager, tutorial: next.progress }
+        }
+        return { ...state, manager: GameManager.finishCombat(state.manager) }
+      }
+      if (!state.tutorial) return state
+      const next = applyTutorialInput(state.manager, state.tutorial, state.selectedCardId, action.input, action.stepIndex)
+      return next ? { ...state, manager: next.manager, tutorial: next.progress, selectedCardId: next.selectedCardId, message: null } : state
+    } catch (error) {
+      return { ...state, message: error instanceof Error ? error.message : '手順を進められません。' }
+    }
+  }
+  if (isTutorialActive(state.tutorial)) return state
   if (action.type === 'selectCard') {
     return {
       ...state,
@@ -87,6 +124,7 @@ const gameUiReducer = (state: GameUiState, action: GameUiAction): GameUiState =>
 
   try {
     return {
+      ...state,
       manager: action.update(state.manager),
       selectedCardId: null,
       message: null,
@@ -104,6 +142,7 @@ const GameSession = ({
   comDeckId,
   difficulty,
   scenarioRun,
+  tutorialMode,
   onResultConfirm,
 }: GameSessionProps) => {
   const aiRef = useRef<GameAI | null>(null)
@@ -117,12 +156,17 @@ const GameSession = ({
     scenarioRun?.currentBattleIndex === 0,
   )
   const [showResult, setShowResult] = useState(false)
+  const [showTutorialGuide, setShowTutorialGuide] = useState(tutorialMode)
   const [rewardChoices, setRewardChoices] = useState<CardDefinitionId[]>([])
-  const [{ manager, selectedCardId, message }, dispatch] = useReducer(
+  const [{ manager, selectedCardId, message, tutorial }, dispatch] = useReducer(
     gameUiReducer,
-    { playerDeckId, comDeckId, difficulty, scenarioRun },
+    { playerDeckId, comDeckId, difficulty, scenarioRun, tutorialMode },
     createGameUiState,
   )
+  const tutorialActive = isTutorialActive(tutorial)
+  const instruction = getTutorialInstruction(manager, tutorial)
+  const tutorialInput = instruction?.actor === 'playerA' && !tutorial?.settling
+    ? instruction.input : null
   const { state } = manager
   const winnerId = GameManager.getWinner(manager)
   const winnerMessage =
@@ -135,10 +179,7 @@ const GameSession = ({
     }
 
     const timeoutId = window.setTimeout(() => {
-      dispatch({
-        type: 'applyGameUpdate',
-        update: (currentManager) => GameManager.finishCombat(currentManager),
-      })
+      dispatch({ type: 'finishCombat' })
     }, COMBAT_EFFECT_DURATION_MS)
 
     return () => window.clearTimeout(timeoutId)
@@ -164,7 +205,7 @@ const GameSession = ({
   }, [scenarioRun, winnerId])
 
   useEffect(() => {
-    if (!import.meta.env.DEV) {
+    if (!import.meta.env.DEV || tutorialActive) {
       return
     }
 
@@ -192,10 +233,11 @@ const GameSession = ({
 
     window.addEventListener('keydown', handleDebugKeyDown)
     return () => window.removeEventListener('keydown', handleDebugKeyDown)
-  }, [])
+  }, [tutorialActive])
 
   useEffect(() => {
     if (
+      tutorialActive ||
       state.activePlayerId !== AI_PLAYER_ID ||
       state.pendingCombat !== null ||
       winnerId !== null
@@ -233,26 +275,35 @@ const GameSession = ({
     }, AI_ACTION_DELAY_MS)
 
     return () => window.clearTimeout(timeoutId)
-  }, [ai, manager, state.activePlayerId, state.pendingCombat, winnerId])
+  }, [ai, manager, state.activePlayerId, state.pendingCombat, tutorialActive, winnerId])
+
+  useEffect(() => {
+    if (!instruction || instruction.actor !== 'playerB' || tutorial?.settling || winnerId !== null || message) return
+    const timeoutId = window.setTimeout(() => {
+      dispatch({ type: 'tutorialInput', input: instruction.input, stepIndex: instruction.stepIndex })
+    }, 1600)
+    return () => window.clearTimeout(timeoutId)
+  }, [instruction, tutorial?.settling, winnerId, message])
+
+  const handleTutorialInput = (input: TutorialInput): boolean => {
+    if (!tutorialActive) return false
+    if (instruction?.actor === 'playerA' && tutorialInput && tutorialInputsEqual(tutorialInput, input)) {
+      dispatch({ type: 'tutorialInput', input, stepIndex: instruction.stepIndex })
+    }
+    return true
+  }
 
   const applyGameUpdate = (update: (currentManager: GameManager) => GameManager) => {
     dispatch({ type: 'applyGameUpdate', update })
   }
 
   const handlePassPhase = () => {
-    applyGameUpdate((currentManager) => {
-      const endingPlayerId = currentManager.state.activePlayerId
-      let nextManager = currentManager
-
-      while (nextManager.state.activePlayerId === endingPlayerId) {
-        nextManager = GameManager.passPhase(nextManager)
-      }
-
-      return nextManager
-    })
+    if (handleTutorialInput({ type: 'endTurn' })) return
+    applyGameUpdate(endCurrentTurn)
   }
 
   const handleCardClick = (cardId: CardInstanceId) => {
+    if (handleTutorialInput({ type: 'selectCard', cardId })) return
     dispatch({ type: 'selectCard', cardId })
   }
 
@@ -265,6 +316,7 @@ const GameSession = ({
       return
     }
 
+    if (handleTutorialInput({ type: 'summonCreature', cardId: selectedCardId, insertIndex })) return
     applyGameUpdate((currentManager) =>
       GameManager.summonCreature(currentManager, selectedCardId, insertIndex),
     )
@@ -286,6 +338,8 @@ const GameSession = ({
   }
 
   const handleGroupAttack = (startIndex: number, endIndex: number) => {
+    const input = { type: 'attackGroup' as const, startIndex, endIndex }
+    if (tutorialActive && (!tutorialInput || !tutorialInputsEqual(tutorialInput, input))) return
     attackAnimationIdRef.current += 1
     setAttackAnimation({
       id: attackAnimationIdRef.current,
@@ -293,6 +347,7 @@ const GameSession = ({
       startIndex,
       endIndex,
     })
+    if (handleTutorialInput(input)) return
     applyGameUpdate((currentManager) =>
       GameManager.attackGroup(currentManager, startIndex, endIndex),
     )
@@ -311,6 +366,14 @@ const GameSession = ({
   return (
     <BattleScene
       manager={manager}
+      tutorialInput={tutorialActive ? tutorialInput : undefined}
+      guide={showTutorialGuide && winnerId === null ? (
+        <TutorialGuide
+          instruction={instruction}
+          settling={tutorial?.settling ?? false}
+          onDismiss={() => setShowTutorialGuide(false)}
+        />
+      ) : undefined}
       playerDeckId={playerDeckId}
       comDeckId={comDeckId}
       selectedCardId={selectedCardId}
@@ -389,6 +452,7 @@ const GameSession = ({
 }
 
 const GameApp = () => {
+  const [tutorialMode, setTutorialMode] = useState(false)
   const [setupMode, setSetupMode] = useState<BattleMode>('scenario')
   const [selection, setSelection] = useState<GameSelection>({
     playerDeckId: THEME_DECK_IDS.RED_TOTAL_ASSAULT,
@@ -414,6 +478,7 @@ const GameApp = () => {
   }
 
   const startGame = (nextSelection: GameSetupSelection) => {
+    setTutorialMode(false)
     setSetupMode(nextSelection.mode)
     if (nextSelection.mode === 'scenario') {
       const opponentDeckIds = getScenarioOpponentDeckIds(nextSelection.playerDeckId)
@@ -477,6 +542,15 @@ const GameApp = () => {
           <TitleScreen
             playerDeckId={selection.playerDeckId}
             onSelectMode={(mode) => {
+              if (mode === 'tutorial') {
+                setTutorialMode(true)
+                setScenarioRun(null)
+                setSetupMode('free')
+                setSelection({ playerDeckId: TUTORIAL.playerDeckId, comDeckId: TUTORIAL.comDeckId, difficulty: TUTORIAL.freeBattleDifficulty })
+                setScreen('game')
+                return
+              }
+              setTutorialMode(false)
               setSetupMode(mode)
               setScreen('setup')
             }}
@@ -504,6 +578,7 @@ const GameApp = () => {
       }
       {...selection}
       scenarioRun={scenarioRun}
+      tutorialMode={tutorialMode}
       onResultConfirm={handleResultConfirm}
     />
   )

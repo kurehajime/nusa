@@ -3294,3 +3294,96 @@
     animation: none;
   }
 }
+
+/* Keep the instruction visible when the guided card scrolls into view. */
+.game-shell-tutorial .game-header {
+  position: sticky;
+  top: 8px;
+  z-index: 55;
+  align-items: center;
+}
+
+.game-shell-tutorial [data-tutorial-target] {
+  scroll-margin-top: 110px;
+  scroll-margin-bottom: 44px;
+}
+
+.tutorial-guide {
+  width: min(560px, 100%);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid #fff;
+  border-radius: 12px;
+  background: rgb(255 254 247 / 94%);
+  color: #26342f;
+  box-shadow: 0 2px 4px rgb(18 22 19 / 25%);
+  font-size: clamp(16px, 2vw, 20px);
+}
+
+.tutorial-guide p {
+  margin: 0;
+  flex: 1;
+}
+
+.tutorial-guide button {
+  border: 2px solid white;
+  border-radius: 6px;
+  background: #2c362f;
+  color: white;
+  min-width: 36px;
+  min-height: 36px;
+  box-shadow: var(--action-button-shadow);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.tutorial-target-marker {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  visibility: hidden;
+  border: 3px solid #bf4b12;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.tutorial-target-marker span {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: #bf4b12;
+  font-size: 28px;
+  line-height: 1;
+  text-shadow: -1px -1px white, 1px -1px white, -1px 1px white, 1px 1px white;
+  animation: tutorial-arrow-bob 0.9s ease-in-out infinite alternate;
+}
+
+.tutorial-target-marker[data-arrow='bottom'] span {
+  top: calc(100% + 5px);
+  bottom: auto;
+  rotate: 180deg;
+}
+
+@keyframes tutorial-arrow-bob {
+  to { translate: 0 -5px; }
+}
+
+@media (max-width: 600px) {
+  .game-shell-tutorial .game-header {
+    gap: 8px;
+  }
+  .game-shell-tutorial .game-header h1 {
+    display: none;
+  }
+  .tutorial-guide {
+    width: 100%;
+    padding: 8px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-target-marker span { animation: none; }
+}

@@ -11,6 +11,7 @@ import {
 import BoardView, { type BoardAttackAnimation } from './BoardView'
 import HandView from './HandView'
 import { getDeckBackgroundStyle } from './deckBackground'
+import type { TutorialInput } from '../game/tutorial/controller'
 
 type BattleSceneProps = {
   manager: GameManager
@@ -27,6 +28,8 @@ type BattleSceneProps = {
   onDiscardCard?: (cardId: CardInstanceId) => void
   onPlaySpell?: (cardId: CardInstanceId) => void
   onPassPhase?: () => void
+  tutorialInput?: TutorialInput | null
+  guide?: ReactNode
   children?: ReactNode
   as?: 'main' | 'div'
   layoutId?: string
@@ -47,6 +50,8 @@ const BattleScene = ({
   onDiscardCard,
   onPlaySpell,
   onPassPhase,
+  tutorialInput,
+  guide,
   children,
   as: Root = 'main',
   layoutId = 'game-card-layout',
@@ -67,10 +72,13 @@ const BattleScene = ({
   )
   const selectedSummonOptions =
     selectedCard?.card.kind === 'creature'
-      ? GameManager.getSummonOptions(manager, selectedCard.id)
+      ? GameManager.getSummonOptions(manager, selectedCard.id).filter((option) =>
+        tutorialInput === undefined || (tutorialInput?.type === 'summonCreature' &&
+          tutorialInput.cardId === selectedCard.id && tutorialInput.insertIndex === option.insertIndex),
+      )
       : []
   const selectedSpellActions =
-    selectedCard?.card.kind === 'spell'
+    tutorialInput === undefined && selectedCard?.card.kind === 'spell'
       ? GameManager.getSpellPlayActions(manager, selectedCard.id)
       : []
   const selectedSpellTargetActions = selectedSpellActions.filter(
@@ -87,7 +95,7 @@ const BattleScene = ({
     ),
   )
   const discardableCardIds = new Set<CardInstanceId>(
-    state.activePlayerId === 'playerA' &&
+    tutorialInput === undefined && state.activePlayerId === 'playerA' &&
       state.phase === 'main' &&
       !state.hasDiscardedThisTurn &&
       state.pendingCombat === null &&
@@ -115,9 +123,10 @@ const BattleScene = ({
       transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.8 }}
     >
       <LayoutGroup id={layoutId}>
-        <Root className="game-shell" style={getDeckBackgroundStyle(comDeckId)}>
+        <Root className={`game-shell${guide ? ' game-shell-tutorial' : ''}`} style={getDeckBackgroundStyle(comDeckId)}>
           <header className="game-header">
             <h1>nusa</h1>
+            {guide}
           </header>
           {message && winnerId === null && (
             <div className="game-message" role="status">
@@ -161,12 +170,14 @@ const BattleScene = ({
             summonOptions={selectedSummonOptions}
             spellTargetActions={selectedSpellTargetActions}
             activatedAbilities={
-              state.activePlayerId === 'playerA' && winnerId === null
+              tutorialInput === undefined && state.activePlayerId === 'playerA' && winnerId === null
                 ? activatedAbilities
                 : []
             }
             attackAnimation={attackAnimation}
+            allowedAttackGroup={tutorialInput?.type === 'attackGroup' ? tutorialInput : undefined}
             canAttack={
+              (tutorialInput === undefined || tutorialInput?.type === 'attackGroup') &&
               state.activePlayerId === 'playerA' &&
               ['main', 'battle'].includes(state.phase) &&
               !state.hasAttackedThisTurn &&
@@ -187,10 +198,13 @@ const BattleScene = ({
               position="bottom"
               playableCardIds={state.activePlayerId === 'playerA' ? playableCardIds : undefined}
               directlyPlayableSpellIds={
-                state.activePlayerId === 'playerA'
+                tutorialInput === undefined && state.activePlayerId === 'playerA'
                   ? directlyPlayableSpellIds
                   : undefined
               }
+              selectableCardIds={tutorialInput === undefined ? undefined : new Set(
+                tutorialInput?.type === 'selectCard' ? [tutorialInput.cardId] : [],
+              )}
               discardableCardIds={discardableCardIds}
               active={state.activePlayerId === 'playerA'}
               disabled={
@@ -207,7 +221,9 @@ const BattleScene = ({
               className="turn-end-button"
               type="button"
               aria-label="ターン終了"
+              data-tutorial-target="end-turn"
               disabled={
+                (tutorialInput !== undefined && tutorialInput?.type !== 'endTurn') ||
                 state.activePlayerId === 'playerB' ||
                 state.phase === 'keepUp' ||
                 state.pendingCombat !== null ||

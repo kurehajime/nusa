@@ -8,6 +8,7 @@ type HandViewProps = {
   faceDown?: boolean
   playerName: string
   position: 'top' | 'bottom'
+  selectableCardIds?: ReadonlySet<CardInstanceId>
   playableCardIds?: ReadonlySet<CardInstanceId>
   directlyPlayableSpellIds?: ReadonlySet<CardInstanceId>
   discardableCardIds?: ReadonlySet<CardInstanceId>
@@ -27,6 +28,7 @@ const HandView = ({
   faceDown = false,
   playerName,
   position,
+  selectableCardIds,
   playableCardIds,
   directlyPlayableSpellIds,
   discardableCardIds,
@@ -64,11 +66,12 @@ const HandView = ({
             layout="position"
             layoutId={card ? `card-${card.id}` : undefined}
             data-card-id={card?.id}
+            data-tutorial-target={card ? `hand-${card.id}` : undefined}
             className={cardClassName}
             type="button"
             aria-label={faceDown ? '裏向きのカード' : card?.card.name}
             title={actionDisabled && card !== null ? '現在は使用できません（タップで詳細表示）' : undefined}
-            disabled={!card || faceDown}
+            disabled={!card || faceDown || (selectableCardIds !== undefined && !selectableCardIds.has(card.id))}
             onClick={() => {
               if (!card) {
                 return

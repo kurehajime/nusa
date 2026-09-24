@@ -52,6 +52,7 @@ type BoardViewProps = {
   activatedAbilities?: ActivatedAbilityOption[]
   spellTargetActions?: PlaySpellAction[]
   attackAnimation?: BoardAttackAnimation | null
+  allowedAttackGroup?: { startIndex: number; endIndex: number }
   canAttack?: boolean
   onInsertClick?: (insertIndex: number) => void
   onGroupAttack?: (startIndex: number, endIndex: number) => void
@@ -195,6 +196,7 @@ const BoardPlayer = ({
       <motion.div
         className="board-endpoint"
         data-player-id={player.id}
+        data-tutorial-target={`player-${player.id}`}
         data-main-color={mainColor}
         data-sub-color={subColor}
         style={
@@ -379,6 +381,7 @@ const BoardGroupButton = ({
 
   return (
     <motion.button
+      data-tutorial-target={`attack-${group.startIndex}-${group.endIndex}`}
       className={`board-group-button board-group-${group.ownerId} ${spellTargetAction ? 'board-group-spell-target' : ''}`}
       style={{
         gridColumn: `${group.startIndex * 2 + 2} / ${group.endIndex * 2 + 3}`,
@@ -429,6 +432,7 @@ const BoardView = ({
   activatedAbilities = [],
   spellTargetActions = [],
   attackAnimation = null,
+  allowedAttackGroup,
   canAttack = false,
   onInsertClick,
   onGroupAttack,
@@ -586,6 +590,7 @@ const BoardView = ({
             <button
               className={getSummonSlotClassName(firstSummonOption, true)}
               data-insert-index={0}
+              data-tutorial-target="insert-0"
               data-summon-state={getSummonSlotState(firstSummonOption) ?? undefined}
               type="button"
               disabled={!firstSummonOption?.canSummon}
@@ -613,6 +618,7 @@ const BoardView = ({
                   key={`insert-${index}`}
                   className={getSummonSlotClassName(summonOption)}
                   data-insert-index={index}
+                  data-tutorial-target={`insert-${index}`}
                   data-summon-state={getSummonSlotState(summonOption) ?? undefined}
                   style={{
                     gridColumn: index * 2 + 1,
@@ -725,6 +731,7 @@ const BoardView = ({
             <button
               className={getSummonSlotClassName(lastSummonOption)}
               data-insert-index={board.creatures.length}
+              data-tutorial-target={`insert-${board.creatures.length}`}
               data-summon-state={getSummonSlotState(lastSummonOption) ?? undefined}
               style={{
                 gridColumn: board.creatures.length * 2 + 1,
@@ -751,7 +758,9 @@ const BoardView = ({
                     ? attackAnimation.id
                     : null
                 }
-                canAttack={canAttack}
+                canAttack={canAttack && (!allowedAttackGroup || (
+                  allowedAttackGroup.startIndex === group.startIndex && allowedAttackGroup.endIndex === group.endIndex
+                ))}
                 spellTargetAction={groupSpellTargetActions.get(
                   `${group.startIndex}-${group.endIndex}`,
                 )}

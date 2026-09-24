@@ -148,6 +148,7 @@ const cloneGameState = (state: GameState): GameState => ({
 const createInitialState = (
   random: () => number,
   deckLists: GameDeckLists,
+  shuffle = true,
 ): GameState => {
   const playerACards = createDeck(deckLists.playerA, 'playerA', 1)
   const playerBCards = createDeck(
@@ -157,14 +158,10 @@ const createInitialState = (
   )
   const cardInstances = [...playerACards, ...playerBCards]
   const cards = Object.fromEntries(cardInstances.map((instance) => [instance.id, instance]))
-  const playerADeck = shuffleCardIds(
-    playerACards.map(({ id }) => id),
-    random,
-  )
-  const playerBDeck = shuffleCardIds(
-    playerBCards.map(({ id }) => id),
-    random,
-  )
+  const orderedA = playerACards.map(({ id }) => id)
+  const orderedB = playerBCards.map(({ id }) => id)
+  const playerADeck = shuffle ? shuffleCardIds(orderedA, random) : orderedA
+  const playerBDeck = shuffle ? shuffleCardIds(orderedB, random) : orderedB
 
   return {
     turn: 1,
@@ -1155,8 +1152,9 @@ export class GameManager {
   static create(
     random: () => number = Math.random,
     deckLists: GameDeckLists = DEFAULT_DECK_LISTS,
+    options: { shuffle?: boolean } = {},
   ): GameManager {
-    return GameManager.from(resolveKeepUpState(createInitialState(random, deckLists)))
+    return GameManager.from(resolveKeepUpState(createInitialState(random, deckLists, options.shuffle)))
   }
 
   static from(state: GameState): GameManager {

@@ -5,7 +5,7 @@ import { getDeckBackgroundStyle } from './deckBackground'
 
 type TitleScreenProps = {
   playerDeckId: ThemeDeckId
-  onSelectMode: (mode: BattleMode) => void
+  onSelectMode: (mode: BattleMode | 'tutorial') => void
 }
 
 const TitleScreen = ({ playerDeckId, onSelectMode }: TitleScreenProps) => (
@@ -18,6 +18,9 @@ const TitleScreen = ({ playerDeckId, onSelectMode }: TitleScreenProps) => (
     </div>
     <section className="setup-panel title-mode-panel" aria-labelledby="mode-selection-title">
       <h2 id="mode-selection-title">モード選択</h2>
+      <button className="title-mode-button" type="button" onClick={() => onSelectMode('tutorial')}>
+        チュートリアル
+      </button>
       <button className="title-mode-button" type="button" onClick={() => onSelectMode('scenario')}>
         シナリオ
       </button>
