@@ -626,7 +626,7 @@ describe('AI evaluation', () => {
     const afterMiningAttack = GameManager.from(miningAttack.nextState)
 
     expect(evaluateBase(manager, 'playerA').upkeepMana).toBe(1.2)
-    expect(playerAttack.playerDamage).toBe(3)
+    expect(playerAttack.playerDamage).toBe(4)
     expect(miningAttack.destroyedCardIds).toHaveLength(1)
     expect(GameManager.getKeepUpManaBonus(afterPlayerAttack, 'playerA')).toBe(1)
     expect(GameManager.getKeepUpManaBonus(afterMiningAttack, 'playerA')).toBe(0)
@@ -694,7 +694,8 @@ describe('AI evaluation', () => {
       GameManager.getEndTurnInstallmentResolution(manager, 'playerA')
         .destroyedCardIds,
     ).toEqual([mephistopheles])
-    expect(evaluateBattleEntry(manager, 'playerA').opponentAttackThreat).toBe(13)
+    // Catapult's 6 attack deals 4 damage past the shield after the unpaid creature leaves.
+    expect(evaluateBattleEntry(manager, 'playerA').opponentAttackThreat).toBe(17)
   })
 
   it('removes an unpaid installment creature even when the opponent cannot attack', () => {
