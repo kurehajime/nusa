@@ -38,10 +38,10 @@ describe('card definition ids', () => {
     expect(GameManager.getSummonOptions(atMana(6), cardId).some(option => option.canSummon)).toBe(true)
     const summoned = GameManager.summonCreature(atMana(6), cardId, 0)
     expect(summoned.state.players.playerA.mana).toBe(0)
-    expect(GameManager.getCreatureStats(summoned, cardId).attack).toBe(8)
+    expect(GameManager.getCreatureStats(summoned, cardId).attack).toBe(9)
     const nextTurn = GameManager.from({ ...summoned.state, turn: summoned.state.turn + 1 })
-    expect(GameManager.getCreatureStats(nextTurn, cardId).attack).toBe(8)
-    expect(summoned.state.cards[cardId].card).toMatchObject({ attack: 8, defense: 8, march: 3, abilities: [{ type: 'vanish' }] })
+    expect(GameManager.getCreatureStats(nextTurn, cardId).attack).toBe(9)
+    expect(summoned.state.cards[cardId].card).toMatchObject({ attack: 9, defense: 9, march: 2, abilities: [{ type: 'vanish' }] })
   })
   it('uses one unique UUID v4 for every card definition', () => {
     const registeredIds = Object.values(CARD_DEFINITION_IDS)
