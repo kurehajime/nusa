@@ -595,6 +595,51 @@ describe('AI evaluation', () => {
     expect(evaluateCoherentMainPlan(manager, 'playerA').total).toBeGreaterThan(passScore)
   })
 
+  it.each(['easy', 'normal', 'hard'] as const)(
+    '%s chooses between one strong summon and a two-card combination',
+    (difficulty) => {
+      const initial = createTestManager()
+      // The first two cards cost five: masking them cannot remove a playable option.
+      const hand = [
+        CARD_ID.EXHAUSTED_VOLCANO_DRAGON,
+        CARD_ID.DREAMWALKING_FOREST_GIANT,
+        CARD_ID.FORMATION_CLEARING_MERCENARY,
+        CARD_ID.CRIMSON_BLADE_INFILTRATOR,
+        CARD_ID.BEACON_HEAVY_CAVALRY,
+      ].map(id => findCardId(initial.state, 'playerB', id))
+      const attacker = findCardId(initial.state, 'playerA', CARD_ID.SPARK_SWORDSMAN)
+      const moved = new Set([...hand, attacker])
+      const deckFor = (playerId: PlayerId) => Object.values(initial.state.cards)
+        .filter(card => card.ownerId === playerId && !moved.has(card.id))
+        .map(card => card.id)
+      const manager = withState(initial, state => ({
+        ...state,
+        turn: 4,
+        phase: 'main',
+        activePlayerId: 'playerB',
+        players: {
+          playerA: { ...state.players.playerA, hp: 20, mana: 1, hand: [], deck: deckFor('playerA') },
+          playerB: { ...state.players.playerB, hp: 18, mana: 4, hand, deck: deckFor('playerB') },
+        },
+        board: { creatures: [{ cardId: attacker, summonedTurn: 3 }] },
+      }))
+
+      const ai = new GameAI({ difficulty, random: () => 0 })
+      const action = ai.chooseAction(manager)
+      expect(action).toEqual({
+        type: 'summonCreature',
+        cardId: difficulty === 'easy' ? hand[4] : hand[2],
+        insertIndex: 0,
+      })
+      if (difficulty !== 'easy' && action !== null) {
+        expect(ai.chooseAction(GameManager.applyAction(manager, action))).toMatchObject({
+          type: 'summonCreature',
+          cardId: hand[3],
+        })
+      }
+    },
+  )
+
   it('keeps the total equal to the sum of its components', () => {
     const evaluation = GameAI.evaluate(createTestManager(), 'playerA')
     const { total, ...components } = evaluation
@@ -911,7 +956,7 @@ describe('GameAI action selection', () => {
     expect(new GameAI().chooseAction(manager)).toEqual({ type: 'passPhase' })
   })
 
-  it('chooses a lethal attack during the battle phase', () => {
+  it.each(['easy', 'normal', 'hard'] as const)('%s chooses a lethal attack during the battle phase', (difficulty) => {
     const manager = createTestManager()
     const cardId = manager.state.players.playerA.hand[0]
     const summoned = GameManager.summonCreature(manager, cardId, 0)
@@ -924,7 +969,7 @@ describe('GameAI action selection', () => {
       },
     }))
 
-    expect(new GameAI().chooseAction(battle)).toEqual({
+    expect(new GameAI({ difficulty, random: () => 0 }).chooseAction(battle)).toEqual({
       type: 'attackGroup',
       startIndex: 0,
       endIndex: 0,

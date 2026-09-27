@@ -57,6 +57,7 @@ const chooseMainAction = (
   aiPlayerId: PlayerId,
   actions: readonly GameAction[],
   ignoredHandCardIds: ReadonlySet<CardInstanceId>,
+  difficulty: AiDifficulty,
 ): GameAction => {
   const hand = manager.state.players[aiPlayerId].hand
   if (
@@ -84,10 +85,13 @@ const chooseMainAction = (
   ).total
   let bestAction: GameAction | null = null
   let bestScore = passScore
+  const evaluateAction = difficulty === 'easy'
+    ? evaluateBattleEntry
+    : evaluateCoherentMainPlan
 
   for (const action of actions) {
     const nextManager = resolveMainActionForEvaluation(manager, action)
-    const score = evaluateCoherentMainPlan(
+    const score = evaluateAction(
       nextManager,
       aiPlayerId,
       ignoredHandCardIds,
@@ -273,6 +277,7 @@ export class GameAI {
           aiPlayerId,
           this.getMainActions(manager, ignoredHandCardIds),
           ignoredHandCardIds,
+          this.difficulty,
         )
         this.turnMemory.remember(manager, action)
         return action
