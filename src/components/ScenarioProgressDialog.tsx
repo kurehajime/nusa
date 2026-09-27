@@ -87,7 +87,12 @@ const ScenarioProgressDialog = ({
         transition={{ delay: 0.06, duration: 0.34, ease: 'easeOut' }}
       >
         <header className="scenario-result-header">
-          <h2 id="scenario-result-title" aria-label={animateResultTitle ? title : undefined}>
+          <h2
+            id="scenario-result-title"
+            aria-label={animateResultTitle
+              ? result === 'loss' ? `${title}（${currentBattleIndex}勝）` : title
+              : undefined}
+          >
             {animateResultTitle
               ? [...title].map((letter) => (
                 <span key={letter} className="scenario-result-letter" aria-hidden="true">
@@ -95,6 +100,11 @@ const ScenarioProgressDialog = ({
                 </span>
               ))
               : title}
+            {result === 'loss' && (
+              <span className="scenario-result-letter scenario-result-win-count" aria-hidden="true">
+                （<span className="scenario-result-win-count-number">{currentBattleIndex}</span>勝）
+              </span>
+            )}
           </h2>
           <span id="scenario-result-description">{description}</span>
         </header>

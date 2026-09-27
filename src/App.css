@@ -785,6 +785,16 @@
   animation-delay: 680ms;
 }
 
+.scenario-result-win-count {
+  font-size: 0.55em;
+  white-space: nowrap;
+  animation-delay: 1160ms;
+}
+
+.scenario-result-win-count-number {
+  font-family: var(--font-numbers);
+}
+
 @keyframes scenario-result-stamp {
   0% {
     opacity: 0;
