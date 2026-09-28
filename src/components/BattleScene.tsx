@@ -10,6 +10,7 @@ import {
 } from '../game'
 import BoardView, { type BoardAttackAnimation } from './BoardView'
 import HandView from './HandView'
+import { getPlayerDamageDelayMs } from './combatPresentation'
 import { getDeckBackgroundStyle } from './deckBackground'
 import type { TutorialInput } from '../game/tutorial/controller'
 
@@ -151,6 +152,7 @@ const BattleScene = ({
             destroyedCardIds={state.pendingCombat?.destroyedCardIds ?? []}
             manaRefundCardIds={manaRefundCardIds}
             playerDamageMarker={playerDamageMarker}
+            playerDamageDelayMs={getPlayerDamageDelayMs(state)}
             players={state.players}
             playerBarriers={{
               playerA: GameManager.getPlayerBarrier(manager, 'playerA'),

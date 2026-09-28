@@ -28,6 +28,7 @@ import ScenarioProgressDialog from './ScenarioProgressDialog'
 import TitleScreen from './TitleScreen'
 import TitleDemo from './TitleDemo'
 import TutorialGuide from './TutorialGuide'
+import { getCombatEffectDurationMs } from './combatPresentation'
 import { TUTORIAL } from '../game/tutorial/script'
 import {
   applyTutorialInput, createTutorial, endCurrentTurn, finishTutorialCombat,
@@ -35,7 +36,6 @@ import {
   type TutorialInput, type TutorialProgress,
 } from '../game/tutorial/controller'
 
-const COMBAT_EFFECT_DURATION_MS = 500
 const AI_ACTION_DELAY_MS = 700
 const RESULT_DIALOG_DELAY_MS = 800
 const AI_PLAYER_ID = 'playerB'
@@ -168,6 +168,7 @@ const GameSession = ({
   const tutorialInput = instruction?.actor === 'playerA' && !tutorial?.settling
     ? instruction.input : null
   const { state } = manager
+  const combatEffectDurationMs = getCombatEffectDurationMs(state)
   const winnerId = GameManager.getWinner(manager)
   const winnerMessage =
     winnerId === null || scenarioRun !== null
@@ -180,10 +181,10 @@ const GameSession = ({
 
     const timeoutId = window.setTimeout(() => {
       dispatch({ type: 'finishCombat' })
-    }, COMBAT_EFFECT_DURATION_MS)
+    }, combatEffectDurationMs)
 
     return () => window.clearTimeout(timeoutId)
-  }, [state.pendingCombat])
+  }, [state.pendingCombat, combatEffectDurationMs])
 
   useEffect(() => {
     if (winnerId === null) {

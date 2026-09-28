@@ -41,6 +41,7 @@ type BoardViewProps = {
   destroyedCardIds?: CardInstanceId[]
   manaRefundCardIds?: CardInstanceId[]
   playerDamageMarker?: { playerId: PlayerId; damage: number } | null
+  playerDamageDelayMs?: number
   players: Record<PlayerState['id'], PlayerState>
   playerBarriers: Record<PlayerId, number>
   playerDeckColors: Record<PlayerId, readonly [CardColor, ...CardColor[]]>
@@ -67,6 +68,7 @@ type BoardPlayerProps = {
   deckColors: readonly [CardColor, ...CardColor[]]
   imageUrl: string
   damage: number | null
+  damageDelayMs: number
 }
 
 type SummonSlotState = 'available' | 'reachable' | 'unreachable'
@@ -163,6 +165,7 @@ const BoardPlayer = ({
   deckColors,
   imageUrl,
   damage,
+  damageDelayMs,
 }: BoardPlayerProps) => {
   const mainColor = deckColors[0]
   const subColor = deckColors[1] ?? mainColor
@@ -230,7 +233,11 @@ const BoardPlayer = ({
               }
             : { x: 0, y: 0 }
         }
-        transition={{ duration: shakeDuration, ease: 'easeInOut' }}
+        transition={{
+          duration: shakeDuration,
+          delay: damage !== null ? damageDelayMs / 1000 : 0,
+          ease: 'easeInOut',
+        }}
       >
         {/* Invisible shared-layout origins for up to one full hand refill. */}
         {player.id === 'playerA' && player.deck.slice(0, 5).map((cardId) => (
@@ -256,7 +263,11 @@ const BoardPlayer = ({
             className={`damage-marker player-damage-marker player-damage-marker-${damageLevel}`}
             role="status"
             aria-label={`プレイヤーに${damage}ダメージ`}
-            style={DAMAGE_MARKER_STYLE}
+            style={{
+              ...DAMAGE_MARKER_STYLE,
+              animationDelay: `${damageDelayMs}ms`,
+              animationFillMode: 'both',
+            }}
           >
             {damage}
           </span>
@@ -421,6 +432,7 @@ const BoardView = ({
   destroyedCardIds = [],
   manaRefundCardIds = [],
   playerDamageMarker = null,
+  playerDamageDelayMs = 0,
   players,
   playerBarriers,
   playerDeckColors,
@@ -575,6 +587,7 @@ const BoardView = ({
         deckColors={playerDeckColors.playerA}
         imageUrl={PLAYER_ICON_URL}
         damage={playerDamageMarker?.playerId === 'playerA' ? playerDamageMarker.damage : null}
+        damageDelayMs={playerDamageDelayMs}
       />
       <span
         className={`board-lane-flow board-lane-flow-${activePlayerId}`}
@@ -779,6 +792,7 @@ const BoardView = ({
         deckColors={playerDeckColors.playerB}
         imageUrl={PLAYER_IMAGE_BY_DECK_ID[playerDeckIds.playerB]}
         damage={playerDamageMarker?.playerId === 'playerB' ? playerDamageMarker.damage : null}
+        damageDelayMs={playerDamageDelayMs}
       />
     </section>
   )

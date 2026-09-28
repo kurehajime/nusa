@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { GameManager } from '../game'
 import type { TitleDemoFrame } from '../game/titleDemo'
 import BattleScene from './BattleScene'
+import { getCombatEffectDurationMs } from './combatPresentation'
 
 const TitleDemo = () => {
   const [frame, setFrame] = useState<TitleDemoFrame | null>(null)
@@ -23,7 +24,9 @@ const TitleDemo = () => {
       waiting = false
       setFrame(data)
       if (!document.hidden) {
-        const delay = data.finished ? 3_000 : data.state.pendingCombat !== null ? 650 : 850
+        const delay = data.finished ? 3_000 : data.state.pendingCombat !== null
+          ? getCombatEffectDurationMs(data.state) + 150
+          : 850
         timer = setTimeout(step, delay)
       }
     }
