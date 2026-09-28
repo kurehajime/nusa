@@ -29,6 +29,7 @@ import TitleScreen from './TitleScreen'
 import TitleDemo from './TitleDemo'
 import TutorialGuide from './TutorialGuide'
 import { getCombatEffectDurationMs } from './combatPresentation'
+import { useDamageSounds } from './useDamageSounds'
 import { TUTORIAL } from '../game/tutorial/script'
 import {
   applyTutorialInput, createTutorial, endCurrentTurn, finishTutorialCombat,
@@ -168,6 +169,7 @@ const GameSession = ({
   const tutorialInput = instruction?.actor === 'playerA' && !tutorial?.settling
     ? instruction.input : null
   const { state } = manager
+  useDamageSounds(state)
   const combatEffectDurationMs = getCombatEffectDurationMs(state)
   const winnerId = GameManager.getWinner(manager)
   const winnerMessage =

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CARD_DEFINITION_IDS as CARD, GameManager, type CardDefinitionId, type PlayerId } from '../game'
-import { getCombatEffectDurationMs, getPlayerDamageDelayMs } from './combatPresentation'
+import { getCombatEffectDurationMs, getDamageSoundCues, getPlayerDamageDelayMs } from './combatPresentation'
 
 const attack = (attackerId: PlayerId, defenders: CardDefinitionId[]) => {
   const defenderId = attackerId === 'playerA' ? 'playerB' : 'playerA'
@@ -52,5 +52,73 @@ describe('combat presentation timing', () => {
       ...state,
       pendingCombat: { ...state.pendingCombat!, endsTurnAfterResolution: false },
     })).toBe(0)
+  })
+})
+
+describe('damage sound cues', () => {
+  it.each<PlayerId>(['playerA', 'playerB'])('plays card then player sounds when %s breaks through', playerId => {
+    expect(getDamageSoundCues(attack(playerId, [CARD.SPARK_SWORDSMAN]).state)).toEqual([
+      { sound: 'normal', delayMs: 0 },
+      { sound: 'player', delayMs: 100 },
+    ])
+  })
+
+  it('plays only the player sound for a direct attack', () => {
+    expect(getDamageSoundCues(attack('playerA', []).state)).toEqual([
+      { sound: 'player', delayMs: 0 },
+    ])
+  })
+
+  it('plays one sound per damaged card, including a surviving card', () => {
+    const { state } = attack('playerA', [CARD.DREAMWALKING_FOREST_GIANT, CARD.DREAMWALKING_FOREST_GIANT])
+    expect(state.pendingCombat!.damageMarkers.length).toBeGreaterThan(1)
+    expect(getDamageSoundCues(state)).toEqual([
+      { sound: 'normal', delayMs: 0 },
+      { sound: 'normal', delayMs: 100 },
+    ])
+  })
+
+  it('keeps every card impact even when the burst exceeds the visual effect duration', () => {
+    const { state } = attack('playerA', Array<CardDefinitionId>(9).fill(CARD.BURNING_VANGUARD))
+    const cues = getDamageSoundCues(state)
+    expect(cues).toHaveLength(9)
+    expect(cues.map(cue => cue.delayMs)).toEqual([0, 100, 200, 300, 400, 500, 600, 700, 800])
+    expect(cues.at(-1)!.delayMs).toBeGreaterThan(getCombatEffectDurationMs(state))
+  })
+
+  it('counts damaged cards rather than duplicate or zero-damage markers', () => {
+    const { state } = attack('playerA', [CARD.SPARK_SWORDSMAN])
+    const combat = state.pendingCombat!
+    const marker = combat.damageMarkers[0]
+    expect(getDamageSoundCues({
+      ...state,
+      pendingCombat: {
+        ...combat,
+        damageMarkers: [marker, marker, { ...marker, damage: 0 }],
+      },
+    })).toEqual([
+      { sound: 'normal', delayMs: 0 },
+      { sound: 'player', delayMs: 100 },
+    ])
+  })
+
+  it('does not play damage sounds for zero damage or resolved combat', () => {
+    const manager = attack('playerA', [])
+    expect(getDamageSoundCues({
+      ...manager.state,
+      pendingCombat: { ...manager.state.pendingCombat!, playerDamage: 0 },
+    })).toEqual([])
+    expect(getDamageSoundCues(GameManager.finishCombat(manager).state)).toEqual([])
+  })
+
+  it('uses the same sound cadence for simultaneous spell impacts', () => {
+    const { state } = attack('playerA', [CARD.SPARK_SWORDSMAN])
+    expect(getDamageSoundCues({
+      ...state,
+      pendingCombat: { ...state.pendingCombat!, endsTurnAfterResolution: false },
+    })).toEqual([
+      { sound: 'normal', delayMs: 0 },
+      { sound: 'player', delayMs: 100 },
+    ])
   })
 })
