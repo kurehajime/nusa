@@ -115,7 +115,7 @@ const ABILITY_HANDLERS = {
   summoningSickness: {
     getAttackOverride: (_ability, context) =>
       getCreatureAt(context.state, context.boardIndex).summonedTurn ===
-      context.state.turn
+        context.state.turn
         ? 0
         : null,
   },
@@ -126,14 +126,14 @@ const ABILITY_HANDLERS = {
     getPositionStatModifier: (ability, context) =>
       (context.boardIndex === 0 ||
         getCreatureOwnerAt(context.state, context.boardIndex - 1) !== context.ownerId) &&
-      (context.boardIndex === context.state.board.creatures.length - 1 ||
-        getCreatureOwnerAt(context.state, context.boardIndex + 1) !== context.ownerId)
+        (context.boardIndex === context.state.board.creatures.length - 1 ||
+          getCreatureOwnerAt(context.state, context.boardIndex + 1) !== context.ownerId)
         ? { attack: ability.attack, defense: ability.defense }
         : NO_STAT_MODIFIER,
   },
   withdraw: {
     getActivatedAbility: (_ability, context) =>
-      createActivatedOption(context, 'withdraw', '撤去', true, ''),
+      createActivatedOption(context, 'withdraw', '撤収', true, ''),
     getActivatedResolution: (_ability, context) => ({
       destination: 'discard',
       mana: context.card.cost,
@@ -238,7 +238,7 @@ export const formatAbility = (ability: KeywordAbility): string => {
     case 'loneWarrior':
       return `一騎当千(+${ability.attack}/+${ability.defense})`
     case 'withdraw':
-      return '撤去'
+      return '撤収'
     case 'assassin':
       return `刺客${ability.attack}`
     case 'counter':
