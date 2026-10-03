@@ -69,7 +69,7 @@ const ScenarioProgressDialog = ({
   const defeatedOpponent = THEME_DECK_BY_ID[opponentDeckIds[currentBattleIndex]]
   const title =
     result === 'intro'
-      ? 'シナリオ開始'
+      ? 'ゲーム開始'
       : scenarioComplete
         ? '全勝'
         : playerWon

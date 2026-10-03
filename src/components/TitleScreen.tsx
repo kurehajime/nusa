@@ -22,7 +22,7 @@ const TitleScreen = ({ playerDeckId, onSelectMode }: TitleScreenProps) => (
         チュートリアル
       </button>
       <button className="title-mode-button" type="button" onClick={() => onSelectMode('scenario')}>
-        シナリオ
+        メインモード
       </button>
       <button className="title-mode-button" type="button" onClick={() => onSelectMode('free')}>
         フリーバトル

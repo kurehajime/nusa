@@ -184,7 +184,7 @@ const GameSetup = ({
       <section className="setup-panel" aria-labelledby="game-setup-title">
         <header className="setup-header">
           <h1 id="game-setup-title">デッキ選択</h1>
-          <span>{mode === 'scenario' ? 'シナリオ' : 'フリーバトル'}</span>
+          <span>{mode === 'scenario' ? 'メインモード' : 'フリーバトル'}</span>
         </header>
         <div className="setup-mode-panel">
           {mode === 'scenario' ? (
@@ -222,7 +222,7 @@ const GameSetup = ({
             タイトルへ戻る
           </button>
           <button className="setup-start-button" type="button" onClick={() => onStart(selection)}>
-            {mode === 'scenario' ? 'シナリオ開始' : 'ゲーム開始'}
+            {mode === 'scenario' ? 'ゲーム開始' : 'ゲーム開始'}
           </button>
         </div>
       </section>
