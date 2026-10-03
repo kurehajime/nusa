@@ -169,9 +169,14 @@ const GameSession = ({
   const tutorialInput = instruction?.actor === 'playerA' && !tutorial?.settling
     ? instruction.input : null
   const { state } = manager
-  const { playResultSound } = useBattleSounds(state)
   const combatEffectDurationMs = getCombatEffectDurationMs(state)
   const winnerId = GameManager.getWinner(manager)
+  const { playResultSound } = useBattleSounds(
+    state,
+    comDeckId,
+    winnerId === null && !showScenarioIntro,
+    RESULT_DIALOG_DELAY_MS,
+  )
   const winnerMessage =
     winnerId === null || scenarioRun !== null
       ? null

@@ -1,21 +1,25 @@
 import { useCallback, useEffect, useRef } from 'react'
-import type { GameState } from '../game'
+import type { GameState, ThemeDeckId } from '../game'
 import { createDamageAudio } from './damageAudio'
 import { getDamageSoundCues, getPlacementSoundCount } from './combatPresentation'
 
-export const useBattleSounds = (state: GameState) => {
+export const useBattleSounds = (state: GameState, musicDeckId: ThemeDeckId, musicPlaying: boolean, musicFadeOutMs: number) => {
   const audio = useRef<ReturnType<typeof createDamageAudio> | null>(null)
   const previousState = useRef(state)
 
   useEffect(() => {
     if (typeof AudioContext === 'undefined') return
-    const player = createDamageAudio()
+    const player = createDamageAudio(musicDeckId)
     audio.current = player
     return () => {
       audio.current = null
       player.dispose()
     }
-  }, [])
+  }, [musicDeckId])
+
+  useEffect(() => {
+    audio.current?.setMusicPlaying(musicPlaying, musicFadeOutMs)
+  }, [musicDeckId, musicPlaying, musicFadeOutMs])
 
   useEffect(() => {
     const previous = previousState.current
