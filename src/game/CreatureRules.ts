@@ -133,7 +133,7 @@ const ABILITY_HANDLERS = {
   },
   withdraw: {
     getActivatedAbility: (_ability, context) =>
-      createActivatedOption(context, 'withdraw', '撤収', true, ''),
+      createActivatedOption(context, 'withdraw', '解散', true, ''),
     getActivatedResolution: (_ability, context) => ({
       destination: 'discard',
       mana: context.card.cost,
@@ -238,7 +238,7 @@ export const formatAbility = (ability: KeywordAbility): string => {
     case 'loneWarrior':
       return `一騎当千(+${ability.attack}/+${ability.defense})`
     case 'withdraw':
-      return '撤収'
+      return '解散'
     case 'assassin':
       return `刺客${ability.attack}`
     case 'counter':

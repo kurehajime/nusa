@@ -319,7 +319,7 @@ export const THEME_DECKS = [
     id: THEME_DECK_IDS.GREEN_RED_FRONTLINE,
     name: 'メガトンハンマー',
     colors: ['green', 'red'],
-    description: '緑の採掘拠点を維持し、赤の基礎火力・撤収・刺客で反攻する。',
+    description: '緑の採掘拠点を維持し、赤の基礎火力・解散・刺客で反攻する。',
     cardDefinitionIds: GREEN_RED_FRONTLINE,
     tournamentShuffleSalt: 63_853_786,
   },
