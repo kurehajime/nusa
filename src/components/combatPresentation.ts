@@ -22,6 +22,16 @@ export const getCombatEffectDurationMs = (state: GameState): number =>
 
 export type DamageSound = 'normal' | 'player'
 
+export const getPlacementSoundCount = (previous: GameState, current: GameState): number => {
+  const previousCardIds = new Set(previous.board.creatures.map(creature => creature.cardId))
+  const summonedCount = current.board.creatures.filter(creature => !previousCardIds.has(creature.cardId)).length
+  const placedSpellCount = (['playerA', 'playerB'] as const).filter(playerId => {
+    const spell = current.players[playerId].placedSpell
+    return spell !== null && spell.cardId !== previous.players[playerId].placedSpell?.cardId
+  }).length
+  return summonedCount + placedSpellCount
+}
+
 export const getDamageSoundCues = (state: GameState): { sound: DamageSound; delayMs: number }[] => {
   const combat = state.pendingCombat
   if (!combat) return []

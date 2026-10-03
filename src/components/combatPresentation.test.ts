@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CARD_DEFINITION_IDS as CARD, GameManager, type CardDefinitionId, type PlayerId } from '../game'
-import { getCombatEffectDurationMs, getDamageSoundCues, getPlayerDamageDelayMs } from './combatPresentation'
+import { getCombatEffectDurationMs, getDamageSoundCues, getPlacementSoundCount, getPlayerDamageDelayMs } from './combatPresentation'
 
 const attack = (attackerId: PlayerId, defenders: CardDefinitionId[]) => {
   const defenderId = attackerId === 'playerA' ? 'playerB' : 'playerA'
@@ -120,5 +120,39 @@ describe('damage sound cues', () => {
       { sound: 'normal', delayMs: 0 },
       { sound: 'player', delayMs: 100 },
     ])
+  })
+})
+
+describe('placement sound cues', () => {
+  it.each<PlayerId>(['playerA', 'playerB'])('plays for %s creature and placed spell, but not removal or re-render', playerId => {
+    const initial = GameManager.create(() => 0.999, {
+      playerA: [CARD.SPARK_SWORDSMAN, CARD.ABUNDANCE],
+      playerB: [CARD.SPARK_SWORDSMAN, CARD.ABUNDANCE],
+    })
+    const hand = Object.values(initial.state.cards)
+      .filter(card => card.ownerId === playerId).map(card => card.id)
+    const manager = GameManager.from({
+      ...initial.state,
+      activePlayerId: playerId,
+      phase: 'main',
+      players: {
+        ...initial.state.players,
+        [playerId]: { ...initial.state.players[playerId], hand, deck: [], mana: 4 },
+      },
+    })
+    const summoned = GameManager.summonCreature(manager, hand[0], 0)
+    expect(getPlacementSoundCount(manager.state, summoned.state)).toBe(1)
+    expect(getPlacementSoundCount(summoned.state, summoned.state)).toBe(0)
+    expect(getPlacementSoundCount(summoned.state, manager.state)).toBe(0)
+    const spell = GameManager.playSpell(summoned, hand[1])
+    expect(getPlacementSoundCount(summoned.state, spell.state)).toBe(1)
+    expect(getPlacementSoundCount(spell.state, summoned.state)).toBe(0)
+  })
+
+  it('does not play a placement sound when existing creatures move', () => {
+    const { state } = attack('playerA', [CARD.SPARK_SWORDSMAN])
+    expect(getPlacementSoundCount(state, {
+      ...state, board: { creatures: [...state.board.creatures].reverse() },
+    })).toBe(0)
   })
 })

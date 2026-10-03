@@ -29,7 +29,7 @@ import TitleScreen from './TitleScreen'
 import TitleDemo from './TitleDemo'
 import TutorialGuide from './TutorialGuide'
 import { getCombatEffectDurationMs } from './combatPresentation'
-import { useDamageSounds } from './useDamageSounds'
+import { useBattleSounds } from './useBattleSounds'
 import { TUTORIAL } from '../game/tutorial/script'
 import {
   applyTutorialInput, createTutorial, endCurrentTurn, finishTutorialCombat,
@@ -169,7 +169,7 @@ const GameSession = ({
   const tutorialInput = instruction?.actor === 'playerA' && !tutorial?.settling
     ? instruction.input : null
   const { state } = manager
-  useDamageSounds(state)
+  const { playResultSound } = useBattleSounds(state)
   const combatEffectDurationMs = getCombatEffectDurationMs(state)
   const winnerId = GameManager.getWinner(manager)
   const winnerMessage =
@@ -404,6 +404,7 @@ const GameSession = ({
             initial={{ opacity: 0, scale: 0.88 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.08, duration: 0.38, ease: 'easeOut' }}
+            onAnimationComplete={() => playResultSound()}
           >
             <p className="game-result-message" role="status" aria-live="assertive">
               {winnerMessage}
@@ -428,6 +429,7 @@ const GameSession = ({
           <ScenarioProgressDialog
             opponentDeckIds={scenarioRun.opponentDeckIds}
             currentBattleIndex={scenarioRun.currentBattleIndex}
+            onResultSound={playResultSound}
             rewardChoices={rewardChoices}
             playerCardDefinitionIds={scenarioRun.playerCardDefinitionIds}
             result={

@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type AnimationEvent, type CSSProperties } from 'react'
 import {
   CARD_BY_DEFINITION_ID,
   THEME_DECK_BY_ID,
@@ -17,6 +17,7 @@ type ScenarioProgressDialogProps = {
   rewardChoices?: readonly CardDefinitionId[]
   playerCardDefinitionIds?: readonly CardDefinitionId[]
   onConfirm: (rewardId?: CardDefinitionId) => void
+  onResultSound?: (delayMs: number) => (() => void) | undefined
 }
 
 const DECK_COLOR_VALUES = {
@@ -32,7 +33,22 @@ const ScenarioProgressDialog = ({
   rewardChoices = [],
   playerCardDefinitionIds = [],
   onConfirm,
+  onResultSound,
 }: ScenarioProgressDialogProps) => {
+  const scheduledSounds = useRef<(() => void)[]>([])
+  useEffect(() => () => {
+    scheduledSounds.current.forEach(cancel => cancel())
+    scheduledSounds.current = []
+  }, [result])
+
+  const handleResultAnimationStart = (event: AnimationEvent<HTMLSpanElement>) => {
+    if (event.target !== event.currentTarget || event.animationName !== 'scenario-result-stamp') return
+    const durationSeconds = Number.parseFloat(getComputedStyle(event.currentTarget).animationDuration)
+    // The 40% keyframe is the impact; animationstart already includes the CSS delay.
+    const delayMs = Math.max(0, (durationSeconds * 0.4 - event.elapsedTime) * 1000)
+    const cancel = onResultSound?.(delayMs)
+    if (cancel) scheduledSounds.current.push(cancel)
+  }
   const [selectedRewardId, setSelectedRewardId] = useState<CardDefinitionId | null>(null)
   const playerWon = result === 'win'
   const scenarioComplete =
@@ -95,13 +111,13 @@ const ScenarioProgressDialog = ({
           >
             {animateResultTitle
               ? [...title].map((letter) => (
-                <span key={letter} className="scenario-result-letter" aria-hidden="true">
+                <span key={letter} className="scenario-result-letter" aria-hidden="true" onAnimationStart={handleResultAnimationStart}>
                   {letter}
                 </span>
               ))
               : title}
             {result === 'loss' && (
-              <span className="scenario-result-letter scenario-result-win-count" aria-hidden="true">
+              <span className="scenario-result-letter scenario-result-win-count" aria-hidden="true" onAnimationStart={handleResultAnimationStart}>
                 （<span className="scenario-result-win-count-number">{currentBattleIndex}</span>勝）
               </span>
             )}
