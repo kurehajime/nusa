@@ -223,7 +223,7 @@ export const CREATURE_CARDS = [
     attack: 2,
     defense: 1,
     march: 1,
-    abilities: [{ type: 'loneWarrior', attack: 2, defense: 0 }],
+    abilities: [{ type: 'loneWarrior', attack: 3, defense: 0 }],
   },
   {
     definitionId: CARD_DEFINITION_IDS.FORMATION_CLEARING_MERCENARY,

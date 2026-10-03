@@ -272,12 +272,12 @@ describe('CreatureRules position modifiers', () => {
       ],
     })
     expect(GameManager.getCreatureStats(manager, loneWarrior)).toEqual({
-      attack: 4,
+      attack: 5,
       defense: 1,
       march: 1,
     })
     expect(GameManager.getCreatureStatModifier(manager, loneWarrior)).toEqual({
-      attack: 2,
+      attack: 3,
       defense: 0,
     })
 
