@@ -6,7 +6,6 @@ import {
   getGroupAt,
   getRallyDestinationIndex,
   isAdjacentToEnemyPlayer,
-  isCreatureFlankedByEnemies,
   isGroupFlankedByEnemies,
   getOpponentId,
 } from './boardQueries'
@@ -55,6 +54,7 @@ type AbilityHandler<TAbility extends KeywordAbility = KeywordAbility> = {
     context: CreatureRuleContext,
     summoningPlayerId: PlayerId,
     insertIndex: number,
+    summoningCard: CreatureCard,
   ) => number
   getOpponentMarchCost?: (
     ability: TAbility,
@@ -161,12 +161,14 @@ const ABILITY_HANDLERS = {
     }),
   },
   beachhead: {
-    getSummonCostModifier: (ability, context, summoningPlayerId, insertIndex) => {
-      const isAdjacentInsert =
-        insertIndex === context.boardIndex || insertIndex === context.boardIndex + 1
+    getSummonCostModifier: (ability, context, summoningPlayerId, insertIndex, summoningCard) => {
+      const frontInsertIndex = context.ownerId === 'playerA'
+        ? context.boardIndex + 1
+        : context.boardIndex
       return summoningPlayerId === context.ownerId &&
-        isAdjacentInsert &&
-        isCreatureFlankedByEnemies(context.state, context.boardIndex)
+        summoningCard.color === context.card.color &&
+        insertIndex === frontInsertIndex &&
+        getFrontIndex(getGroupAt(context.state, context.boardIndex)) === context.boardIndex
         ? -ability.costReduction
         : 0
     },
@@ -283,7 +285,7 @@ export const describeAbility = (ability: KeywordAbility): string => {
     case 'rally':
       return '起動型能力。最も前方にある自グループの末尾に移動する。'
     case 'beachhead':
-      return `このクリーチャーの両隣が敵クリーチャーまたは敵プレイヤーの場合、このクリーチャーの隣に召喚する味方のコストは${ability.costReduction}減少する。`
+      return `このクリーチャーがグループの先頭にいる場合、このクリーチャーの前に召喚する同じ色のクリーチャーの召喚コストは${ability.costReduction}軽減される。`
     case 'capture':
       return `このクリーチャーを越える際、必要な進軍距離を+${ability.marchTax}する。`
     case 'mining':
@@ -391,7 +393,11 @@ export class CreatureRules {
     return contributions
   }
 
-  getSummonCostModifier(summoningPlayerId: PlayerId, insertIndex: number): number {
+  getSummonCostModifier(
+    summoningPlayerId: PlayerId,
+    insertIndex: number,
+    summoningCard: CreatureCard,
+  ): number {
     return this.getAbilities().reduce(
       (total, ability) =>
         total +
@@ -400,6 +406,7 @@ export class CreatureRules {
           this.context,
           summoningPlayerId,
           insertIndex,
+          summoningCard,
         ) ?? 0),
       0,
     )

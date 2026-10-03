@@ -426,16 +426,68 @@ describe('CreatureRules position modifiers', () => {
 })
 
 describe('summon modifiers', () => {
+  it.each<PlayerId>(['playerA', 'playerB'])(
+    'discounts only same-color summons directly ahead of a group-leading bridgehead for %s',
+    (ownerId) => {
+      const initial = withHandSize(createTestManager(), ownerId, 0)
+      const enemyId = ownerId === 'playerA' ? 'playerB' : 'playerA'
+      const [scout, nextScout] = findCardIds(initial.state, ownerId, CARD_ID.TIDEFRONT_FORTIFIER, 2)
+      const [blue] = findCardIds(initial.state, ownerId, CARD_ID.TIDEWAY_SCOUT)
+      const [red] = findCardIds(initial.state, ownerId, CARD_ID.FORMATION_CLEARING_MERCENARY)
+      const [green] = findCardIds(initial.state, ownerId, CARD_ID.OAKBARK_SENTINEL)
+      const [enemyScout] = findCardIds(initial.state, enemyId, CARD_ID.TIDEFRONT_FORTIFIER)
+      const fromOwnSide = (ids: CardInstanceId[]) =>
+        (ownerId === 'playerA' ? ids : [...ids].reverse()).map(cardId => ({ cardId }))
+      const manager = configureManager(initial, {
+        board: fromOwnSide([scout]), activePlayerId: ownerId,
+        mana: { [ownerId]: 1 }, handAdditions: [blue, red, green],
+      })
+      const front = ownerId === 'playerA' ? 1 : 0
+      const rear = 1 - front
+      expect(GameManager.getSummonOptions(manager, blue)[front]).toMatchObject({ effectiveCost: 1, canSummon: true })
+      expect(GameManager.getSummonOptions(manager, blue)[rear]).toMatchObject({ effectiveCost: 2, affordable: false })
+      for (const cardId of [red, green]) {
+        expect(GameManager.getSummonOptions(manager, cardId)[front]).toMatchObject({ effectiveCost: 2, affordable: false })
+        expect(() => GameManager.summonCreature(manager, cardId, front)).toThrow('Not enough mana')
+      }
+      const summoned = GameManager.summonCreature(manager, blue, front)
+      expect(summoned.state.players[ownerId].mana).toBe(0)
+
+      // A friendly creature behind the source is allowed; one ahead blocks the ability.
+      for (const ids of [[green, scout], [scout, green], [enemyScout]]) {
+        const position = configureManager(initial, {
+          board: fromOwnSide(ids), activePlayerId: ownerId, handAdditions: [blue],
+        })
+        const costs = GameManager.getSummonOptions(position, blue).map(option => option.effectiveCost)
+        const expected = ids.map(() => 2).concat(2)
+        if (ids[ids.length - 1] === scout) expected[ownerId === 'playerA' ? ids.length : 0] = 1
+        expect(costs).toEqual(expected)
+      }
+
+      // A new scout can extend the discount, but two scouts do not stack it.
+      let chain = configureManager(initial, {
+        board: fromOwnSide([scout]), activePlayerId: ownerId,
+        mana: { [ownerId]: 2 }, handAdditions: [nextScout, blue],
+      })
+      chain = GameManager.summonCreature(chain, nextScout, front)
+      const nextFront = ownerId === 'playerA' ? 2 : 0
+      expect(GameManager.getSummonOptions(chain, blue)[nextFront].effectiveCost).toBe(1)
+      expect(GameManager.getSummonOptions(chain, blue)[1].effectiveCost).toBe(2)
+      chain = GameManager.summonCreature(chain, blue, nextFront)
+      expect(chain.state.players[ownerId].mana).toBe(0)
+    },
+  )
+
   it.each(['playerA', 'playerB'] as const)(
     'matches individual position queries across all short capture/beachhead boards for %s',
     (ownerId) => {
       const boardCards = [CARD_ID.TIDEFRONT_FORTIFIER, CARD_ID.VINE_SNARE_HUNTER]
-      const deck = [CARD_ID.SPARK_SWORDSMAN, ...Array.from({ length: 4 }, () => boardCards).flat()]
+      const deck = [CARD_ID.TIDEWAY_SCOUT, ...Array.from({ length: 4 }, () => boardCards).flat()]
       const initial = withHandSize(withHandSize(
         GameManager.create(KEEP_ORDER_RANDOM, { playerA: deck, playerB: deck }),
         'playerA', 0,
       ), 'playerB', 0)
-      const [summonId] = findCardIds(initial.state, ownerId, CARD_ID.SPARK_SWORDSMAN)
+      const [summonId] = findCardIds(initial.state, ownerId, CARD_ID.TIDEWAY_SCOUT)
       const summonCard = initial.state.cards[summonId].card as CreatureCard
       const pools = (['playerA', 'playerB'] as const).flatMap((playerId) =>
         boardCards.map((definitionId) => findCardIds(initial.state, playerId, definitionId, 4)),
@@ -468,7 +520,7 @@ describe('summon modifiers', () => {
           const expected = Array.from({ length: length + 1 }, (_, insertIndex) => {
             const requiredMarch = GameManager.getRequiredMarchForInsert(manager, ownerId, insertIndex)
             const costModifier = board.reduce((total, _, index) => total +
-              new CreatureRules(manager.state, index).getSummonCostModifier(ownerId, insertIndex), 0)
+              new CreatureRules(manager.state, index).getSummonCostModifier(ownerId, insertIndex, summonCard), 0)
             const effectiveCost = Math.max(0, summonCard.cost + costModifier)
             const canReach = requiredMarch <= summonCard.march
             const affordable = effectiveCost <= availableMana
@@ -664,7 +716,7 @@ describe('summon modifiers', () => {
   })
 
   it('uses bridgehead discounted cost for playability and mana payment', () => {
-    const initial = createTestManager()
+    const initial = withHandSize(createTestManager(), 'playerA', 4)
     const [enemy] = findCardIds(
       initial.state,
       'playerB',
@@ -678,11 +730,12 @@ describe('summon modifiers', () => {
     const [summonCard] = findCardIds(
       initial.state,
       'playerA',
-      CARD_ID.SPARK_SWORDSMAN,
+      CARD_ID.TIDEWAY_SCOUT,
     )
     let manager = configureManager(initial, {
       board: [{ cardId: enemy }, { cardId: beachhead }],
       mana: { playerA: 1 },
+      handAdditions: [summonCard],
     })
     expect(manager.state.cards[beachhead].card).toMatchObject({
       name: '偵察者',

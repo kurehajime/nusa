@@ -321,7 +321,7 @@ const getEffectiveSummonCost = (
   insertIndex: number,
   boardRules: readonly CreatureRules[],
 ): number => Math.max(0, card.cost + boardRules.reduce(
-  (total, rules) => total + rules.getSummonCostModifier(ownerId, insertIndex),
+  (total, rules) => total + rules.getSummonCostModifier(ownerId, insertIndex, card),
   0,
 ))
 
