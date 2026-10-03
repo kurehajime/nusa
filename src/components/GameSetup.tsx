@@ -38,9 +38,9 @@ const AI_DIFFICULTIES: readonly {
   value: AiDifficulty
   label: string
 }[] = [
-    { value: 'easy', label: 'Easy' },
-    { value: 'normal', label: 'Normal' },
-    { value: 'hard', label: 'Hard' },
+    { value: 'easy', label: 'Normal' },
+    { value: 'normal', label: 'Hard' },
+    { value: 'hard', label: 'Very Hard' },
   ]
 
 const COLOR_LABELS: Record<CardColor, string> = {
