@@ -304,14 +304,14 @@ export const CREATURE_CARDS = [
   },
   {
     definitionId: CARD_DEFINITION_IDS.ROOT_FORT_REARGUARD,
-    name: '墓守',
+    name: '近衛兵',
     kind: 'creature',
     color: 'green',
     cost: 2,
     attack: 2,
     defense: 2,
     march: 1,
-    abilities: [{ type: 'rearguard', attack: 0, defense: 2 }],
+    abilities: [{ type: 'rearguard', attack: 1, defense: 3 }],
   },
   {
     definitionId: CARD_DEFINITION_IDS.LONE_ARMY_GENERAL,

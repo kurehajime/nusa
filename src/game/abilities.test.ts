@@ -160,6 +160,43 @@ describe('board march distance', () => {
 })
 
 describe('CreatureRules position modifiers', () => {
+  it.each<PlayerId>(['playerA', 'playerB'])('grants escort only next to %s and recalculates after insertion', ownerId => {
+    const initial = withHandSize(createTestManager(), ownerId, 4)
+    const [guard, secondGuard] = findCardIds(initial.state, ownerId, CARD_ID.ROOT_FORT_REARGUARD, 2)
+    const [ally] = findCardIds(initial.state, ownerId, CARD_ID.OAKBARK_SENTINEL)
+    const enemyId = ownerId === 'playerA' ? 'playerB' : 'playerA'
+    const [enemy] = findCardIds(initial.state, enemyId, CARD_ID.SPARK_SWORDSMAN)
+    const boardFromOwnSide = (ids: CardInstanceId[]) =>
+      (ownerId === 'playerA' ? ids : [...ids].reverse()).map(cardId => ({ cardId }))
+
+    for (const ids of [[guard], [guard, ally, enemy], [guard, secondGuard, enemy]]) {
+      const manager = configureManager(initial, { board: boardFromOwnSide(ids) })
+      expect(GameManager.getCreatureStats(manager, guard)).toMatchObject({ attack: 3, defense: 5 })
+      if (ids.includes(secondGuard)) {
+        expect(GameManager.getCreatureStats(manager, secondGuard)).toMatchObject({ attack: 2, defense: 2 })
+      }
+    }
+    for (const ids of [[ally, guard, enemy], [enemy, guard]]) {
+      const manager = configureManager(initial, { board: boardFromOwnSide(ids) })
+      expect(GameManager.getCreatureStats(manager, guard)).toMatchObject({ attack: 2, defense: 2 })
+    }
+
+    const manager = configureManager(initial, {
+      board: boardFromOwnSide([guard, enemy]), activePlayerId: ownerId,
+      handAdditions: [ally], mana: { [ownerId]: 2 },
+    })
+    const inserted = GameManager.summonCreature(manager, ally, ownerId === 'playerA' ? 0 : 2)
+    expect(GameManager.getCreatureStats(inserted, guard)).toMatchObject({ attack: 2, defense: 2 })
+
+    const battle = configureManager(initial, {
+      board: boardFromOwnSide([guard, enemy]), activePlayerId: enemyId, phase: 'battle',
+    })
+    const enemyIndex = ownerId === 'playerA' ? 1 : 0
+    const preview = GameManager.previewCombat(battle, enemyIndex, enemyIndex)
+    expect(preview.destroyedCardIds).not.toContain(guard)
+    expect(preview.playerDamage).toBe(0)
+  })
+
   it('keeps rejecting invalid positions, missing cards, and spells on the board', () => {
     const manager = createTestManager()
     expect(() => new CreatureRules(manager.state, -1)).toThrow(/No creature exists/)
@@ -260,7 +297,7 @@ describe('CreatureRules position modifiers', () => {
     manager = configureManager(initial, {
       board: [{ cardId: enemyLeft }, { cardId: rearguardA }],
     })
-    expect(GameManager.getCreatureStats(manager, rearguardA).defense).toBe(4)
+    expect(GameManager.getCreatureStats(manager, rearguardA)).toMatchObject({ attack: 2, defense: 2 })
 
     const [rearguardB] = findCardIds(
       initial.state,
@@ -275,7 +312,7 @@ describe('CreatureRules position modifiers', () => {
     manager = configureManager(initial, {
       board: [{ cardId: rearguardB }, { cardId: allyA }],
     })
-    expect(GameManager.getCreatureStats(manager, rearguardB).defense).toBe(4)
+    expect(GameManager.getCreatureStats(manager, rearguardB)).toMatchObject({ attack: 2, defense: 2 })
 
     manager = configureManager(initial, {
       board: [{ cardId: allyA, summonedTurn: 10 }],

@@ -5,7 +5,6 @@ import {
   getFrontIndex,
   getGroupAt,
   getRallyDestinationIndex,
-  getRearNeighborIndex,
   isAdjacentToEnemyPlayer,
   isCreatureFlankedByEnemies,
   isGroupFlankedByEnemies,
@@ -190,9 +189,10 @@ const ABILITY_HANDLERS = {
   },
   rearguard: {
     getPositionStatModifier: (ability, context) => {
-      const rearIndex = getRearNeighborIndex(context.state, context.boardIndex)
-      return rearIndex !== null &&
-        getCreatureOwnerAt(context.state, rearIndex) !== context.ownerId
+      const ownPlayerEdge = context.ownerId === 'playerA'
+        ? 0
+        : context.state.board.creatures.length - 1
+      return context.boardIndex === ownPlayerEdge
         ? { attack: ability.attack, defense: ability.defense }
         : NO_STAT_MODIFIER
     },
@@ -252,7 +252,7 @@ export const formatAbility = (ability: KeywordAbility): string => {
     case 'mining':
       return `採掘${ability.mana}`
     case 'rearguard':
-      return `しんがり(+${ability.attack}/+${ability.defense})`
+      return `護衛(+${ability.attack}/+${ability.defense})`
     case 'installment':
       return `リボ払い${ability.mana}`
     case 'trickster':
@@ -289,7 +289,7 @@ export const describeAbility = (ability: KeywordAbility): string => {
     case 'mining':
       return `このクリーチャーが所属するグループが敵クリーチャーまたは敵プレイヤーに囲まれている場合、自分のキープアップフェイズに追加で${ability.mana}マナを得る。同一グループ内の<<採掘>>は重複しない。`
     case 'rearguard':
-      return `このクリーチャーの後方に敵クリーチャーが隣接する場合、攻撃力+${ability.attack}、防御力+${ability.defense}する。`
+      return `このクリーチャーが自プレイヤーに隣接する場合、攻撃力+${ability.attack}、防御力+${ability.defense}する。`
     case 'installment':
       return `自分のエンドフェイズにマナ${ability.mana}を支払う。足りない場合はこのクリーチャーを破壊する。この効果で破壊された場合はマナは返還されない。`
     case 'trickster':

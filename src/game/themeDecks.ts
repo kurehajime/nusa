@@ -327,7 +327,7 @@ export const THEME_DECKS = [
     id: THEME_DECK_IDS.BLUE_GREEN_INTERCEPT,
     name: '真綿',
     colors: ['blue', 'green'],
-    description: '青の位置制御と反撃を、緑の高防御・捕獲・しんがりで支える。',
+    description: '青の位置制御と反撃を、緑の高防御・捕獲・護衛で支える。',
     cardDefinitionIds: BLUE_GREEN_INTERCEPT,
     tournamentShuffleSalt: 2_589_017_928,
   },
