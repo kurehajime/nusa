@@ -74,7 +74,7 @@ type AbilityHandler<TAbility extends KeywordAbility = KeywordAbility> = {
     context: CreatureRuleContext,
   ) => ActivatedAbilityOption
   getKeepUpPlayerDamage?: (ability: TAbility, context: CreatureRuleContext) => number
-  getAttackDeckDiscardCount?: (attackPower: number) => number
+  getPlayerDamageDeckDiscardCount?: (playerDamage: number) => number
   getActivatedResolution?: (
     ability: TAbility,
     context: CreatureRuleContext,
@@ -222,7 +222,7 @@ const ABILITY_HANDLERS = {
     getKeepUpPlayerDamage: (ability) => ability.damage,
   },
   gluttony: {
-    getAttackDeckDiscardCount: (attackPower) => attackPower,
+    getPlayerDamageDeckDiscardCount: (playerDamage) => playerDamage,
   },
 } satisfies AbilityHandlerMap
 
@@ -269,7 +269,7 @@ export const formatAbility = (ability: KeywordAbility): string => {
 export const describeAbility = (ability: KeywordAbility): string => {
   switch (ability.type) {
     case 'gluttony':
-      return 'このクリーチャーを含むグループが攻撃した時、自分の山札をグループの攻撃力と同じ枚数だけ上から捨てる。'
+      return 'このクリーチャーを含むグループが相手プレイヤーにダメージを与えた時、自分の山札を与えたダメージと同じ枚数だけ上から捨てる。'
     case 'summoningSickness':
       return '召喚したターンは攻撃力0として扱う。'
     case 'vanish':
@@ -420,10 +420,10 @@ export class CreatureRules {
     )
   }
 
-  getAttackDeckDiscardCount(attackPower: number): number {
+  getPlayerDamageDeckDiscardCount(playerDamage: number): number {
     return this.getAbilities().reduce(
       (total, ability) => total +
-        (getAbilityHandler(ability).getAttackDeckDiscardCount?.(attackPower) ?? 0),
+        (getAbilityHandler(ability).getPlayerDamageDeckDiscardCount?.(playerDamage) ?? 0),
       0,
     )
   }
