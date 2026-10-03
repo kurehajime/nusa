@@ -154,8 +154,8 @@ export const CREATURE_CARDS = [
     color: 'red',
     cost: 4,
     attack: 6,
-    defense: 2,
-    march: 1,
+    defense: 3,
+    march: 0,
     abilities: [],
   },
   {

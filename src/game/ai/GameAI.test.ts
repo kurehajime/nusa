@@ -629,7 +629,8 @@ describe('AI evaluation', () => {
       expect(action).toEqual({
         type: 'summonCreature',
         cardId: difficulty === 'easy' ? hand[4] : hand[2],
-        insertIndex: 0,
+        // The catapult has march zero, so it must stay on our side of the enemy.
+        insertIndex: difficulty === 'easy' ? 1 : 0,
       })
       if (difficulty !== 'easy' && action !== null) {
         expect(ai.chooseAction(GameManager.applyAction(manager, action))).toMatchObject({

@@ -558,32 +558,37 @@ describe('summon modifiers', () => {
     },
   )
 
-  it('keeps march zero creatures at the starting edge when they have no ally anchor', () => {
-    const initial = withHandSize(createTestManager(), 'playerA', 4)
-    const [enemy] = findCardIds(
-      initial.state,
-      'playerB',
-      CARD_ID.SPARK_SWORDSMAN,
-    )
-    const [rootedCreature] = findCardIds(
-      initial.state,
-      'playerA',
-      CARD_ID.ROOTED_ANCIENT,
-    )
-    const manager = configureManager(initial, {
-      board: [{ cardId: enemy }],
-      mana: { playerA: 2 },
-      handAdditions: [rootedCreature],
+  it.each([
+    ['playerA', CARD_ID.ROOTED_ANCIENT],
+    ['playerB', CARD_ID.ROOTED_ANCIENT],
+    ['playerA', CARD_ID.BEACON_HEAVY_CAVALRY],
+    ['playerB', CARD_ID.BEACON_HEAVY_CAVALRY],
+  ] as const)('allows march zero summons only at our edge or next to allies: %s %s', (ownerId, definitionId) => {
+    const initial = withHandSize(createTestManager(), ownerId, 0)
+    const enemyId = ownerId === 'playerA' ? 'playerB' : 'playerA'
+    const [enemy] = findCardIds(initial.state, enemyId, CARD_ID.SPARK_SWORDSMAN)
+    const [ally] = findCardIds(initial.state, ownerId, CARD_ID.SPARK_SWORDSMAN)
+    const [source] = findCardIds(initial.state, ownerId, definitionId)
+    const setup = (ids: CardInstanceId[]) => configureManager(initial, {
+      board: (ownerId === 'playerA' ? ids : [...ids].reverse()).map(cardId => ({ cardId })),
+      activePlayerId: ownerId, mana: { [ownerId]: 4 }, handAdditions: [source],
     })
-
-    expect(GameManager.getSummonOptions(manager, rootedCreature)[0]).toMatchObject({
-      requiredMarch: 0,
-      canReach: true,
-    })
-    expect(GameManager.getSummonOptions(manager, rootedCreature)[1]).toMatchObject({
-      requiredMarch: 1,
-      canReach: false,
-    })
+    const manager = setup([enemy])
+    const ownEdge = ownerId === 'playerA' ? 0 : 1
+    const beyondEnemy = 1 - ownEdge
+    expect(GameManager.getSummonOptions(manager, source)[ownEdge]).toMatchObject({ requiredMarch: 0, canSummon: true })
+    expect(GameManager.getSummonOptions(manager, source)[beyondEnemy]).toMatchObject({ requiredMarch: 1, canReach: false })
+    expect(() => GameManager.summonCreature(manager, source, beyondEnemy)).toThrow(/cannot be summoned at this position/)
+    const summoned = GameManager.summonCreature(manager, source, ownEdge)
+    if (definitionId === CARD_ID.BEACON_HEAVY_CAVALRY) {
+      expect(GameManager.getCreatureStats(summoned, source)).toEqual({ attack: 6, defense: 3, march: 0 })
+      expect(summoned.state.players[ownerId].mana).toBe(0)
+    }
+    // A forward ally still provides a legal anchor on either side.
+    const anchored = setup([enemy, ally])
+    for (const index of (ownerId === 'playerA' ? [1, 2] : [0, 1])) {
+      expect(GameManager.getSummonOptions(anchored, source)[index]).toMatchObject({ requiredMarch: 0, canSummon: true })
+    }
   })
 
   it('does not use an advanced creature as an anchor for a backward interruption', () => {
