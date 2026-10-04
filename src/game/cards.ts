@@ -62,7 +62,7 @@ export const EXPANSION_CARD_DEFINITION_IDS = [
 export const CREATURE_CARDS = [
   {
     definitionId: CARD_DEFINITION_IDS.CLEANER,
-    name: '掃除屋',
+    name: '捨て駒',
     kind: 'creature',
     color: 'blue',
     cost: 0,
