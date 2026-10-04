@@ -111,6 +111,7 @@ const createActivatedOption = (
 }
 
 const ABILITY_HANDLERS = {
+  betrayal: {},
   summoningSickness: {
     getAttackOverride: (_ability, context) =>
       getCreatureAt(context.state, context.boardIndex).summonedTurn ===
@@ -231,6 +232,8 @@ const getAbilityHandler = (ability: KeywordAbility): AbilityHandler =>
 
 export const formatAbility = (ability: KeywordAbility): string => {
   switch (ability.type) {
+    case 'betrayal':
+      return '裏切り'
     case 'gluttony':
       return '大喰い'
     case 'summoningSickness':
@@ -268,6 +271,8 @@ export const formatAbility = (ability: KeywordAbility): string => {
 
 export const describeAbility = (ability: KeywordAbility): string => {
   switch (ability.type) {
+    case 'betrayal':
+      return 'このクリーチャーが召喚されたとき、同じグループにいる他の自クリーチャーをすべて破壊する。'
     case 'gluttony':
       return 'このクリーチャーを含むグループが相手プレイヤーにダメージを与えた時、自分の山札を与えたダメージと同じ枚数だけ上から捨てる。'
     case 'summoningSickness':
@@ -339,6 +344,15 @@ export class CreatureRules {
 
   private getAbilities(): KeywordAbility[] {
     return this.context.card.abilities
+  }
+
+  getSummonDestroyedCardIds(): CardInstanceId[] {
+    if (!this.getAbilities().some((ability) => ability.type === 'betrayal')) return []
+    const group = getGroupAt(this.context.state, this.context.boardIndex)
+    return this.context.state.board.creatures
+      .slice(group.startIndex, group.endIndex + 1)
+      .filter(({ cardId }) => cardId !== this.context.cardId)
+      .map(({ cardId }) => cardId)
   }
 
   getPositionStatModifier(): CreatureStatModifier {

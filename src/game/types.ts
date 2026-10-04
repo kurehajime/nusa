@@ -13,6 +13,7 @@ export type CardInstanceId = number
 export type CardDefinitionId = `${string}-${string}-${string}-${string}-${string}`
 
 export type KeywordAbility =
+  | { type: 'betrayal' }
   | { type: 'summoningSickness' }
   | { type: 'vanish' }
   | { type: 'loneWarrior'; attack: number; defense: number }

@@ -1580,10 +1580,25 @@ export class GameManager {
       ...manager.state.board.creatures.slice(insertIndex),
     ]
 
-    return GameManager.from({
+    const summonedState: GameState = {
       ...replacePlayer(manager.state, nextPlayer),
       board: {
         creatures: nextCreatures,
+      },
+    }
+    const destroyedIds = new Set(
+      new CreatureRules(summonedState, insertIndex).getSummonDestroyedCardIds(),
+    )
+    if (destroyedIds.size === 0) return GameManager.from(summonedState)
+
+    return GameManager.from({
+      ...summonedState,
+      players: refundDestroyedCreatures(
+        summonedState,
+        nextCreatures.filter(({ cardId }) => destroyedIds.has(cardId)),
+      ),
+      board: {
+        creatures: nextCreatures.filter(({ cardId }) => !destroyedIds.has(cardId)),
       },
     })
   }

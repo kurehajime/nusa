@@ -43,6 +43,7 @@ export const CARD_DEFINITION_IDS = {
   CATACLYSM: '2ef4e015-72dc-4538-892e-a31bab369607',
   GIANT_FROG: 'bcf14485-d233-4a0e-bb1e-bc93338e4aa9',
   WORLD_SERPENT: '108c96ea-99a7-4fff-aca0-8105915327db',
+  CLEANER: 'b1f4c373-fc40-49c8-98a8-6811d15e0067',
 } as const satisfies Record<string, CardDefinitionId>
 
 export const EXPANSION_CARD_DEFINITION_IDS = [
@@ -55,9 +56,21 @@ export const EXPANSION_CARD_DEFINITION_IDS = [
   CARD_DEFINITION_IDS.CATACLYSM,
   CARD_DEFINITION_IDS.GIANT_FROG,
   CARD_DEFINITION_IDS.WORLD_SERPENT,
+  CARD_DEFINITION_IDS.CLEANER,
 ] as const satisfies readonly CardDefinitionId[]
 
 export const CREATURE_CARDS = [
+  {
+    definitionId: CARD_DEFINITION_IDS.CLEANER,
+    name: '掃除屋',
+    kind: 'creature',
+    color: 'blue',
+    cost: 0,
+    attack: 1,
+    defense: 1,
+    march: 1,
+    abilities: [{ type: 'betrayal' }],
+  },
   {
     definitionId: CARD_DEFINITION_IDS.WORLD_SERPENT,
     name: '世界蛇',
